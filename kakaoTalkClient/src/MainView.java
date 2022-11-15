@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -7,19 +8,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 
 // 친구 목록, 채팅 목록 나오는 화면
@@ -29,9 +40,11 @@ public class MainView extends JFrame {
 	private Socket socket; // 연결소켓
 	public ObjectInputStream ois;
 	public ObjectOutputStream oos;
+	public String userName = "";
 	
 	
 	public MainView(String username, String ip_addr, String port_no) {
+		userName = username;
 		setBounds(100, 100, 390, 630);
 		getContentPane().setLayout(null);
 		setTitle("카카오톡");
@@ -82,7 +95,12 @@ public class MainView extends JFrame {
 						continue;
 					
 					switch (cm.getCode()) {
-					case "200":
+					// 31 : 프로필 요청 결과
+					// 
+					case "31":
+						ImageIcon myProfileImg = cm.img;
+						// appendProfile 함수를 만들어야 하나?
+						// 일단 append로 붙이라고 했으니까. 틀을 만들어야 되잖아.
 						break;
 					}
 				} catch (IOException e) {
@@ -158,6 +176,8 @@ public class MainView extends JFrame {
 		private ImageIcon main_search = new ImageIcon("./img/main_search.png");
 		private ImageIcon main_addFriend = new ImageIcon("./img/main_addFriend.png");
 		private JTextField textField;
+		private JTextPane textPane;
+		private JScrollPane scrollPane;
 		
 		public FriendPanel(JFrame frame) {
 			frame.add(this);
@@ -191,24 +211,73 @@ public class MainView extends JFrame {
 			addFriendBtn.setBorderPainted(false);
 			
 			
-			JScrollPane scrollPane = new JScrollPane();
+			scrollPane = new JScrollPane();
 			add(scrollPane);
 			scrollPane.setBounds(0, 141, 304, 450);
 			
 			
-			JTextPane textPane = new JTextPane();
+			textPane = new JTextPane();
 			scrollPane.add(textPane);
-			textPane.setText("친구들 프로필");
-			textPane.setBackground(Color.LIGHT_GRAY);
+			textPane.setBackground(Color.WHITE);
 			textPane.setEditable(false);
 			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(textPane);
+			addComponent(makeProfile(main_search, "JKS", "상태메시지"));
+			addComponent(makeProfile(main_search, "NAME", "STATUS"));
+			addComponent(makeProfile(main_search, "NAME", "STATUS"));
+			addComponent(makeProfile(main_search, "NAME", "STATUS"));
+			addComponent(makeProfile(main_search, "NAME", "STATUS"));
 			
+			// TODO 내 프로필도 add로 붙일건지, 그렇다면 상단에 어떻게 붙일지
 			JButton btnNewButton = new JButton("내 프로필");;
 			add(btnNewButton);
 			btnNewButton.setBounds(0, 70, 304, 61);
 		}
+		
+		// 프로필 만드는 함수
+		public Component makeProfile(ImageIcon profile, String name, String status) {
+			JLabel label = new JLabel();
+			label.setIcon(profile);
+			label.setText("<html>" + name + "<br/>" + status + "</html>");
+			
+			label.setIconTextGap(20); // 사진과 텍스트 거리
+			label.setOpaque(true);
+			label.setBackground(Color.WHITE);
+			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 10, 60));
+			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 10, 60));
+			label.setBorder(BorderFactory.createLineBorder(Color.black));
+			
+			// 프로필 클릭했을 때 나올 프로필 변경 프레임
+			label.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e)  
+			    {  
+					JFrame frame = new JFrame();
+					frame.setVisible(true);
+					frame.setResizable(false);
+					frame.setTitle("프로필");
+					// TODO 현재 위치 고정 -> 클릭 프로필 위치에 따라 변동
+					frame.setBounds(label.getX() + 200, label.getY() + 240, 300, 300);
+					
+					// TODO userName.equals(name)일 때 프로필 변경 가능. 
+			    }  
+			});
+			
+			return label;
+		}
+
+		// 친구들 프로필에 컴포넌트 추가하는 함수
+		public void addComponent(Component component) {
+			StyledDocument doc = (StyledDocument) textPane.getDocument();
+		    Style style = doc.addStyle("StyleName", null);
+		    StyleConstants.setComponent(style, component);
+		    try {
+				doc.insertString(doc.getLength(), "ignored text\n", style);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+		}
 	}
+	
 	
 	
 	// 채팅 목록 나오는 패널
