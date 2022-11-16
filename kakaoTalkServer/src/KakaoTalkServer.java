@@ -26,7 +26,7 @@ import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 
-public class JavaObjServer extends JFrame {
+public class KakaoTalkServer extends JFrame {
 
 	/**
 	 * 
@@ -48,7 +48,7 @@ public class JavaObjServer extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					JavaObjServer frame = new JavaObjServer();
+					KakaoTalkServer frame = new KakaoTalkServer();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -60,7 +60,7 @@ public class JavaObjServer extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public JavaObjServer() {
+	public KakaoTalkServer() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 338, 440);
 		contentPane = new JPanel();

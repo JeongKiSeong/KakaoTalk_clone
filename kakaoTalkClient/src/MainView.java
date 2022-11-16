@@ -273,7 +273,7 @@ public class MainView extends JFrame {
 		// 프로필 변경하는 프레임
 		class ProfileFrame extends JFrame {
 			public ProfileFrame() {
-				setTitle("프로필 변경");
+				setTitle("프로필");
 				setSize(300, 300);
 				setVisible(true);
 				
