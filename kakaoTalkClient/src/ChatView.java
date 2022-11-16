@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -51,6 +52,7 @@ public class ChatView extends JFrame {
 		textField.setBorder(null);
 		textField.setColumns(10);
 		textField.setBorder(BorderFactory.createEmptyBorder(10 , 10 , 10 , 10));
+		textField.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		textField.addActionListener(textSendAction);
 		
 		// 사진, 파일 전송 버튼이 있는 패널
@@ -66,6 +68,7 @@ public class ChatView extends JFrame {
 		sendBtn.setBounds(300, 3, 62, 36);
 		sendBtn.setBorderPainted(false);
 		sendBtn.addActionListener(textSendAction);
+		sendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		// 이모티콘 버튼
 		JButton emoteBtn = new JButton(chat_emote);
@@ -73,6 +76,7 @@ public class ChatView extends JFrame {
 		emoteBtn.setRolloverIcon(chat_emote_clicked);
 		emoteBtn.setBounds(8, 3, 37, 37);
 		emoteBtn.setBorderPainted(false);
+		emoteBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		// 파일 버튼
 		JButton fileBtn = new JButton(chat_file);
@@ -80,6 +84,7 @@ public class ChatView extends JFrame {
 		fileBtn.setRolloverIcon(chat_file_clicked);
 		fileBtn.setBorderPainted(false);
 		fileBtn.setBounds(52, 3, 37, 37);
+		fileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 		// 채팅창 이름, 채팅창 사진이 있는 패널
 		JPanel chatInfoPanel = new JPanel();

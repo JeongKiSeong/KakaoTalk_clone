@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
@@ -148,6 +149,7 @@ public class MainView extends JFrame {
 			friendBtn.setRolloverIcon(main_friend_clicked);
 			friendBtn.setBounds(0, 35, 70, 70);
 			friendBtn.setBorderPainted(false);
+			friendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			JToggleButton chatroomBtn = new JToggleButton(main_chatroom);
 			add(chatroomBtn);
@@ -156,6 +158,7 @@ public class MainView extends JFrame {
 			chatroomBtn.setRolloverIcon(main_chatroom_clicked);
 			chatroomBtn.setBounds(0, 103, 70, 70);
 			chatroomBtn.setBorderPainted(false);
+			chatroomBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			// 친구, 채팅 버튼 토글 이벤트
 			friendBtn.addItemListener(new ItemListener() {
@@ -220,11 +223,13 @@ public class MainView extends JFrame {
 			topPanel.add(searchBtn);
 			searchBtn.setBounds(202, 10, 41, 41);
 			searchBtn.setBorderPainted(false);
+			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			JButton addFriendBtn = new JButton(main_addFriend);
 			topPanel.add(addFriendBtn);
 			addFriendBtn.setBounds(251, 10, 41, 41);
 			addFriendBtn.setBorderPainted(false);
+			addFriendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			
 			scrollPane = new JScrollPane();
@@ -262,6 +267,7 @@ public class MainView extends JFrame {
 			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
 			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
 			label.setBorder(BorderFactory.createLineBorder(Color.black));
+			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			// 프로필 클릭했을 때 나올 프로필 변경 프레임
 			label.addMouseListener(new MouseAdapter() {
@@ -298,12 +304,14 @@ public class MainView extends JFrame {
 				panel.add(imgLabel);
 				imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				imgLabel.setBounds(114, 36, 61, 56);
+				//imgLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				
 				JLabel nameLabel = new JLabel(name);
 				panel.add(nameLabel);
 				nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 				nameLabel.setBounds(100, 143, 90, 34);
 				nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				//nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 				JLabel statusLabel = new JLabel(status);
 				panel.add(statusLabel);
@@ -311,6 +319,7 @@ public class MainView extends JFrame {
 				statusLabel.setSize(172, 29);
 				statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 				statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				
 				// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
 				// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
@@ -357,18 +366,13 @@ public class MainView extends JFrame {
 			topPanel.add(searchBtn);
 			searchBtn.setBounds(202, 10, 41, 41);
 			searchBtn.setBorderPainted(false);
+			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			JButton addChatBtn = new JButton(main_addChat);
 			topPanel.add(addChatBtn);
 			addChatBtn.setBounds(251, 10, 41, 41);
 			addChatBtn.setBorderPainted(false);
-			
-//			JTextPane textPane = new JTextPane();
-//			add(textPane);
-//			textPane.setText("채팅방 위치");
-//			textPane.setEditable(false);
-//			textPane.setBackground(new Color(255, 255, 128));
-//			textPane.setBounds(0, 70, 374, 520);
+			addChatBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			scrollPane = new JScrollPane();
 			add(scrollPane);
@@ -390,6 +394,7 @@ public class MainView extends JFrame {
 			textPane.setSelectionStart(0);
 			textPane.setSelectionEnd(0);
 		}
+		
 		// 채팅방 컴포넌트 만드는 함수
 		public Component makeChatroom(ImageIcon profile, String roomName, String lastChat) {
 			JLabel label = new JLabel();
@@ -403,6 +408,7 @@ public class MainView extends JFrame {
 			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
 			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
 			label.setBorder(BorderFactory.createLineBorder(Color.black));
+			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			// 채팅방 클릭했을 때 채팅방 프레임 띄우기
 			label.addMouseListener(new MouseAdapter() {
