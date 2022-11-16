@@ -90,7 +90,6 @@ public class StartView extends JFrame {
 			String ip_addr = txtIpAddress.getText().trim();
 			String port_no = txtPortNumber.getText().trim();
 			MainView view = new MainView(username, ip_addr, port_no);
-			new ChatView(view);
 			setVisible(false);
 		}
 	}

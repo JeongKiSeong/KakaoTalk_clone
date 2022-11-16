@@ -42,6 +42,8 @@ public class MainView extends JFrame {
 	public ObjectOutputStream oos;
 	public String userName = "";
 	
+	JFrame mainView;
+	
 	
 	public MainView(String username, String ip_addr, String port_no) {
 		userName = username;
@@ -51,6 +53,8 @@ public class MainView extends JFrame {
 		setResizable(false);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		mainView = this;
 		
 		
 		FriendPanel friendPanel = new FriendPanel(this);
@@ -169,6 +173,18 @@ public class MainView extends JFrame {
 		}
 	}
 	
+	// JTextPane에 컴포넌트 추가하는 함수
+	public void addComponent(JTextPane textPane, Component component) {
+		StyledDocument doc = (StyledDocument) textPane.getDocument();
+	    Style style = doc.addStyle("StyleName", null);
+	    StyleConstants.setComponent(style, component);
+	    try {
+			doc.insertString(doc.getLength(), "ignored text\n", style);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// 친구 목록 나오는 패널
 	class FriendPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
@@ -177,7 +193,6 @@ public class MainView extends JFrame {
 		private ImageIcon main_addFriend = new ImageIcon("./img/main_addFriend.png");
 		private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
 		private JTextField textField;
-		private JTextPane textPane;
 		private JScrollPane scrollPane;
 		
 		public FriendPanel(JFrame frame) {
@@ -218,24 +233,29 @@ public class MainView extends JFrame {
 			scrollPane.setBorder(null);
 			
 			
-			textPane = new JTextPane();
+			JTextPane textPane = new JTextPane();
 			scrollPane.add(textPane);
 			textPane.setBackground(Color.WHITE);
 			textPane.setEditable(false);
 			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(textPane);
-			addComponent(makeProfile(profile_default, "JKS", "상태메시지"));
+			addComponent(textPane, makeProfile(profile_default, "JKS", "상태메시지"));
 			for (int i=0; i<20; i++)
-				addComponent(makeProfile(profile_default, "NAME", "STATUS"));
+				addComponent(textPane, makeProfile(profile_default, "NAME", "STATUS"));
+			
+			// 스크롤 맨 위로 올리기
+			textPane.setSelectionStart(0);
+			textPane.setSelectionEnd(0);
 			
 		}
 		
-		// 프로필 만드는 함수
+		// 프로필 컴포넌트 만드는 함수
 		public Component makeProfile(ImageIcon profile, String name, String status) {
 			JLabel label = new JLabel();
 			label.setIcon(profile);
 			label.setText("<html>" + name + "<br/>" + status + "</html>");
-			
+
+			label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			label.setIconTextGap(20); // 사진과 텍스트 거리
 			label.setOpaque(true);
 			label.setBackground(Color.WHITE);
@@ -247,9 +267,9 @@ public class MainView extends JFrame {
 			label.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e)  
 			    {  
-					JFrame frame = new ProfileFrame();
+					JFrame frame = new ProfileFrame(profile, name, status);
 					Point location = label.getLocationOnScreen();
-					frame.setLocation(location.x + label.getWidth(), location.y);
+					frame.setLocation(location.x + label.getWidth() + 20, location.y);
 					
 					// TODO 프로필 변경 패널?
 					// TODO userName.equals(name)일 때 프로필 변경 가능. 
@@ -258,21 +278,12 @@ public class MainView extends JFrame {
 			
 			return label;
 		}
-
-		// 친구들 프로필에 컴포넌트 추가하는 함수
-		public void addComponent(Component component) {
-			StyledDocument doc = (StyledDocument) textPane.getDocument();
-		    Style style = doc.addStyle("StyleName", null);
-		    StyleConstants.setComponent(style, component);
-		    try {
-				doc.insertString(doc.getLength(), "ignored text\n", style);
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
-		}
-		// 프로필 변경하는 프레임
+		
+		// 프로필 띄울 프레임
 		class ProfileFrame extends JFrame {
-			public ProfileFrame() {
+			private static final long serialVersionUID = 1L;
+
+			public ProfileFrame(ImageIcon profile, String name, String status) {
 				setTitle("프로필");
 				setSize(300, 300);
 				setVisible(true);
@@ -283,23 +294,26 @@ public class MainView extends JFrame {
 				panel.setLayout(null);
 				
 
-				JLabel imgLabel = new JLabel(profile_default);
+				JLabel imgLabel = new JLabel(profile);
 				panel.add(imgLabel);
 				imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				imgLabel.setBounds(114, 36, 61, 56);
 				
-				JLabel nameLabel = new JLabel("nameLabel");
+				JLabel nameLabel = new JLabel(name);
 				panel.add(nameLabel);
-				nameLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
-				nameLabel.setBounds(104, 143, 90, 34);
+				nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+				nameLabel.setBounds(100, 143, 90, 34);
+				nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-				JLabel statusLabel = new JLabel("statusLabel");
+				JLabel statusLabel = new JLabel(status);
 				panel.add(statusLabel);
 				statusLabel.setLocation(58, 187);
 				statusLabel.setSize(172, 29);
+				statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 				statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				
-				// TODO 레이블에 마우스 리스너 달기
+				// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
+				// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
 			}
 		}
 	}
@@ -313,7 +327,9 @@ public class MainView extends JFrame {
 		
 		private ImageIcon main_search = new ImageIcon("./img/main_search.png");
 		private ImageIcon main_addChat = new ImageIcon("./img/main_addChat.png");
+		private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
 		private JTextField textField;
+		private JScrollPane scrollPane;
 
 		public ChatroomPanel(JFrame frame) {
 			frame.add(this);
@@ -347,12 +363,57 @@ public class MainView extends JFrame {
 			addChatBtn.setBounds(251, 10, 41, 41);
 			addChatBtn.setBorderPainted(false);
 			
+//			JTextPane textPane = new JTextPane();
+//			add(textPane);
+//			textPane.setText("채팅방 위치");
+//			textPane.setEditable(false);
+//			textPane.setBackground(new Color(255, 255, 128));
+//			textPane.setBounds(0, 70, 374, 520);
+			
+			scrollPane = new JScrollPane();
+			add(scrollPane);
+			scrollPane.setBounds(0, 70, 304, 520);
+			scrollPane.setBorder(null);
+			
 			JTextPane textPane = new JTextPane();
-			add(textPane);
-			textPane.setText("채팅방 위치");
+			scrollPane.add(textPane);
+			textPane.setBackground(Color.WHITE);
 			textPane.setEditable(false);
-			textPane.setBackground(new Color(255, 255, 128));
-			textPane.setBounds(0, 70, 374, 520);
+			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+			scrollPane.setViewportView(textPane);
+			addComponent(textPane, makeChatroom(profile_default, "홍길동", "아버지!"));
+			for (int i=0; i<20; i++)
+				addComponent(textPane, makeChatroom(profile_default, "채팅방 이름", "마지막 대화 내용"));
+			
+
+			// 스크롤 맨 위로 올리기
+			textPane.setSelectionStart(0);
+			textPane.setSelectionEnd(0);
 		}
+		// 채팅방 컴포넌트 만드는 함수
+		public Component makeChatroom(ImageIcon profile, String roomName, String lastChat) {
+			JLabel label = new JLabel();
+			label.setIcon(profile);
+			label.setText("<html>" + roomName + "<br/>" + lastChat + "</html>");
+			
+			label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+			label.setIconTextGap(20); // 사진과 텍스트 거리
+			label.setOpaque(true);
+			label.setBackground(Color.WHITE);
+			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
+			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
+			label.setBorder(BorderFactory.createLineBorder(Color.black));
+			
+			// 채팅방 클릭했을 때 채팅방 프레임 띄우기
+			label.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e)  
+			    {  
+					JFrame chatView = new ChatView(mainView.getLocation(), roomName);
+			    }  
+			});
+			
+			return label;
+		}
+
 	}
 }
