@@ -4,8 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -27,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -175,6 +175,7 @@ public class MainView extends JFrame {
 		
 		private ImageIcon main_search = new ImageIcon("./img/main_search.png");
 		private ImageIcon main_addFriend = new ImageIcon("./img/main_addFriend.png");
+		private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
 		private JTextField textField;
 		private JTextPane textPane;
 		private JScrollPane scrollPane;
@@ -213,7 +214,8 @@ public class MainView extends JFrame {
 			
 			scrollPane = new JScrollPane();
 			add(scrollPane);
-			scrollPane.setBounds(0, 141, 304, 450);
+			scrollPane.setBounds(0, 70, 304, 520);
+			scrollPane.setBorder(null);
 			
 			
 			textPane = new JTextPane();
@@ -222,16 +224,10 @@ public class MainView extends JFrame {
 			textPane.setEditable(false);
 			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(textPane);
-			addComponent(makeProfile(main_search, "JKS", "상태메시지"));
-			addComponent(makeProfile(main_search, "NAME", "STATUS"));
-			addComponent(makeProfile(main_search, "NAME", "STATUS"));
-			addComponent(makeProfile(main_search, "NAME", "STATUS"));
-			addComponent(makeProfile(main_search, "NAME", "STATUS"));
+			addComponent(makeProfile(profile_default, "JKS", "상태메시지"));
+			for (int i=0; i<20; i++)
+				addComponent(makeProfile(profile_default, "NAME", "STATUS"));
 			
-			// TODO 내 프로필도 add로 붙일건지, 그렇다면 상단에 어떻게 붙일지
-			JButton btnNewButton = new JButton("내 프로필");;
-			add(btnNewButton);
-			btnNewButton.setBounds(0, 70, 304, 61);
 		}
 		
 		// 프로필 만드는 함수
@@ -243,21 +239,19 @@ public class MainView extends JFrame {
 			label.setIconTextGap(20); // 사진과 텍스트 거리
 			label.setOpaque(true);
 			label.setBackground(Color.WHITE);
-			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 10, 60));
-			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 10, 60));
+			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
+			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
 			label.setBorder(BorderFactory.createLineBorder(Color.black));
 			
 			// 프로필 클릭했을 때 나올 프로필 변경 프레임
 			label.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e)  
 			    {  
-					JFrame frame = new JFrame();
-					frame.setVisible(true);
-					frame.setResizable(false);
-					frame.setTitle("프로필");
-					// TODO 현재 위치 고정 -> 클릭 프로필 위치에 따라 변동
-					frame.setBounds(label.getX() + 200, label.getY() + 240, 300, 300);
+					JFrame frame = new ProfileFrame();
+					Point location = label.getLocationOnScreen();
+					frame.setLocation(location.x + label.getWidth(), location.y);
 					
+					// TODO 프로필 변경 패널?
 					// TODO userName.equals(name)일 때 프로필 변경 가능. 
 			    }  
 			});
@@ -274,6 +268,38 @@ public class MainView extends JFrame {
 				doc.insertString(doc.getLength(), "ignored text\n", style);
 			} catch (BadLocationException e) {
 				e.printStackTrace();
+			}
+		}
+		// 프로필 변경하는 프레임
+		class ProfileFrame extends JFrame {
+			public ProfileFrame() {
+				setTitle("프로필 변경");
+				setSize(300, 300);
+				setVisible(true);
+				
+				JPanel panel = new JPanel();
+				add(panel);
+				panel.setBackground(Color.WHITE);
+				panel.setLayout(null);
+				
+
+				JLabel imgLabel = new JLabel(profile_default);
+				panel.add(imgLabel);
+				imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				imgLabel.setBounds(114, 36, 61, 56);
+				
+				JLabel nameLabel = new JLabel("nameLabel");
+				panel.add(nameLabel);
+				nameLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+				nameLabel.setBounds(104, 143, 90, 34);
+
+				JLabel statusLabel = new JLabel("statusLabel");
+				panel.add(statusLabel);
+				statusLabel.setLocation(58, 187);
+				statusLabel.setSize(172, 29);
+				statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				
+				// TODO 레이블에 마우스 리스너 달기
 			}
 		}
 	}
