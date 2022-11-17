@@ -5,6 +5,8 @@ import javax.swing.JScrollPane;
 
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -39,11 +43,13 @@ public class MainView extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private Socket socket; // 연결소켓
-	public ObjectInputStream ois;
-	public ObjectOutputStream oos;
-	public String userName = "";
+	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
+	private String userName = "";
+	private List<JLabel> FriendLabelList = new ArrayList<JLabel>();
+	private List<JLabel> RoomLabelList = new ArrayList<JLabel>();
 	
-	JFrame mainView;
+	private JFrame mainView;
 	
 	
 	public MainView(String username, String ip_addr, String port_no) {
@@ -123,7 +129,25 @@ public class MainView extends JFrame {
 			}
 		}
 	}
-		
+	
+
+	// 이름, 코드, 메시지를 서버에 전송
+	public void SendMessage(String name, String code, String msg) {
+		try {
+			ChatMsg obcm = new ChatMsg(name, code, msg);
+			oos.writeObject(obcm);
+		} catch (IOException e) {
+			System.out.println("oos.writeObject() error");
+			try {
+				ois.close();
+				oos.close();
+				socket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				System.exit(0);
+			}
+		}
+	}
 
 	class MenuPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
@@ -225,6 +249,7 @@ public class MainView extends JFrame {
 			searchBtn.setBorderPainted(false);
 			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
+			
 			JButton addFriendBtn = new JButton(main_addFriend);
 			topPanel.add(addFriendBtn);
 			addFriendBtn.setBounds(251, 10, 41, 41);
@@ -244,87 +269,19 @@ public class MainView extends JFrame {
 			textPane.setEditable(false);
 			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(textPane);
-			addComponent(textPane, makeProfile(profile_default, "JKS", "상태메시지"));
+			
+			FriendLabelList.add(new FriendLabel(profile_default, "JKS", "상태메시지"));
 			for (int i=0; i<20; i++)
-				addComponent(textPane, makeProfile(profile_default, "NAME", "STATUS"));
+				FriendLabelList.add(new FriendLabel(profile_default, "NAME", "STATUS"));
+			for (JLabel label : FriendLabelList)
+				addComponent(textPane, label);
+			
 			
 			// 스크롤 맨 위로 올리기
 			textPane.setSelectionStart(0);
 			textPane.setSelectionEnd(0);
 			
-		}
-		
-		// 프로필 컴포넌트 만드는 함수
-		public Component makeProfile(ImageIcon profile, String name, String status) {
-			JLabel label = new JLabel();
-			label.setIcon(profile);
-			label.setText("<html>" + name + "<br/>" + status + "</html>");
-
-			label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-			label.setIconTextGap(20); // 사진과 텍스트 거리
-			label.setOpaque(true);
-			label.setBackground(Color.WHITE);
-			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
-			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
-			label.setBorder(BorderFactory.createLineBorder(Color.black));
-			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			
-			// 프로필 클릭했을 때 나올 프로필 변경 프레임
-			label.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e)  
-			    {  
-					JFrame frame = new ProfileFrame(profile, name, status);
-					Point location = label.getLocationOnScreen();
-					frame.setLocation(location.x + label.getWidth() + 20, location.y);
-					
-					// TODO 프로필 변경 패널?
-					// TODO userName.equals(name)일 때 프로필 변경 가능. 
-			    }  
-			});
-			
-			return label;
-		}
-		
-		// 프로필 띄울 프레임
-		class ProfileFrame extends JFrame {
-			private static final long serialVersionUID = 1L;
-
-			public ProfileFrame(ImageIcon profile, String name, String status) {
-				setTitle("프로필");
-				setSize(300, 300);
-				setVisible(true);
-				
-				JPanel panel = new JPanel();
-				add(panel);
-				panel.setBackground(Color.WHITE);
-				panel.setLayout(null);
-				
-
-				JLabel imgLabel = new JLabel(profile);
-				panel.add(imgLabel);
-				imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
-				imgLabel.setBounds(114, 36, 61, 56);
-				//imgLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				
-				JLabel nameLabel = new JLabel(name);
-				panel.add(nameLabel);
-				nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-				nameLabel.setBounds(100, 143, 90, 34);
-				nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-				//nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-				JLabel statusLabel = new JLabel(status);
-				panel.add(statusLabel);
-				statusLabel.setLocation(58, 187);
-				statusLabel.setSize(172, 29);
-				statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-				statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-				//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				
-				// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
-				// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
-			}
-		}
+		}		
 	}
 	
 	
@@ -385,40 +342,16 @@ public class MainView extends JFrame {
 			textPane.setEditable(false);
 			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(textPane);
-			addComponent(textPane, makeChatroom(profile_default, "홍길동", "아버지!"));
+
+			RoomLabelList.add(new RoomLabel(profile_default, "홍길동", "아버지!", mainView.getLocationOnScreen(), "1"));
 			for (int i=0; i<20; i++)
-				addComponent(textPane, makeChatroom(profile_default, "채팅방 이름", "마지막 대화 내용"));
-			
+				RoomLabelList.add(new RoomLabel(profile_default, "채팅방 이름", "마지막 대화 내용", mainView.getLocationOnScreen(), "1"));
+			for (JLabel label : RoomLabelList)
+				addComponent(textPane, label);
 
 			// 스크롤 맨 위로 올리기
 			textPane.setSelectionStart(0);
 			textPane.setSelectionEnd(0);
-		}
-		
-		// 채팅방 컴포넌트 만드는 함수
-		public Component makeChatroom(ImageIcon profile, String roomName, String lastChat) {
-			JLabel label = new JLabel();
-			label.setIcon(profile);
-			label.setText("<html>" + roomName + "<br/>" + lastChat + "</html>");
-			
-			label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-			label.setIconTextGap(20); // 사진과 텍스트 거리
-			label.setOpaque(true);
-			label.setBackground(Color.WHITE);
-			label.setMaximumSize(new Dimension(scrollPane.getWidth() - 25, 80));
-			label.setMinimumSize(new Dimension(scrollPane.getWidth() - 25, 80));
-			label.setBorder(BorderFactory.createLineBorder(Color.black));
-			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			
-			// 채팅방 클릭했을 때 채팅방 프레임 띄우기
-			label.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e)  
-			    {  
-					JFrame chatView = new ChatView(mainView.getLocation(), roomName);
-			    }  
-			});
-			
-			return label;
 		}
 
 	}

@@ -20,11 +20,11 @@ public class ChatView extends JFrame {
 	
 	// TODO 내 채팅 색 (255, 235, 51)
 	
-	public ChatView(Point p, String roomName) {
+	public ChatView(Point p, String room_id, String room_name) {
 		// mainView 오른쪽에 나오도록
 		setBounds(p.x + 380, p.y, 390, 630);
 		getContentPane().setLayout(null);
-		setTitle(roomName);
+		setTitle(room_name);
 		setResizable(false);
 		setVisible(true);
 		

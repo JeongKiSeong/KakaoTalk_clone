@@ -5,9 +5,11 @@ import javax.swing.ImageIcon;
 class ChatMsg implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String id;
-	private String code; // 100:로그인, 400:로그아웃, 200:채팅메시지, 300:Image
+	private String code;
 	private String data;
 	public ImageIcon img;
+	public String userlist;	
+	public String room_id;	
 
 	public ChatMsg(String id, String code, String msg) {
 		this.id = id;
