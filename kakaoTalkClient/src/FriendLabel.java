@@ -13,7 +13,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class FriendLabel extends JLabel {
+	public FriendLabel() {
+	}
 	private static final long serialVersionUID = 1L;
+	
+	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
+	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
 	
 	public FriendLabel(ImageIcon img, String bigText, String smallText) {
 		setOpaque(true);
@@ -37,6 +42,12 @@ public class FriendLabel extends JLabel {
 		this.add(smallTextLabel);
 		smallTextLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		smallTextLabel.setBounds(80, 35, 180, 20);
+		
+		// TODO 온라인 -> 초록불, 오프라인 -> 파란불
+		JLabel StatusLabel = new JLabel(status_green);
+		this.add(StatusLabel);
+		StatusLabel.setBounds(260, 30, 10, 10);
+		
 		
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
