@@ -23,7 +23,7 @@ public class FriendLabel extends JLabel {
 	public FriendLabel(ImageIcon img, String bigText, String smallText) {
 		setOpaque(true);
 		setBackground(Color.WHITE);
-		setBorder(BorderFactory.createLineBorder(Color.black));
+		//setBorder(BorderFactory.createLineBorder(Color.black));
 		setBounds(0, 0, 280, 80);
 		setPreferredSize(new Dimension(280, 70));
 		setMaximumSize(new Dimension(280, 70));
@@ -48,7 +48,7 @@ public class FriendLabel extends JLabel {
 		this.add(StatusLabel);
 		StatusLabel.setBounds(260, 30, 10, 10);
 		
-		
+		// 클릭 시 프로필 프레임 생성
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
 		    {  
@@ -59,6 +59,18 @@ public class FriendLabel extends JLabel {
 				// TODO 프로필 변경 패널?
 				// TODO userName.equals(name)일 때 프로필 변경 가능. 
 		    }  
+		});
+		
+		// 마우스 over할 때 색 교체
+		this.addMouseListener(new MouseAdapter(){
+		    @Override
+		    public void mouseEntered(MouseEvent e) {
+		        setBackground(new Color(248, 248, 248));
+		    }
+		    @Override
+		    public void mouseExited(MouseEvent e) {
+		        setBackground(Color.WHITE);
+		    }
 		});
 	}
 

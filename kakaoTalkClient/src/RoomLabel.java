@@ -17,7 +17,7 @@ public class RoomLabel extends JLabel {
 	public RoomLabel(ImageIcon img, String bigText, String smallText, Point p, String room_id) {
 		setOpaque(true);
 		setBackground(Color.WHITE);
-		setBorder(BorderFactory.createLineBorder(Color.black));
+		//setBorder(BorderFactory.createLineBorder(Color.black));
 		setBounds(0, 0, 280, 80);
 		setPreferredSize(new Dimension(280, 70));
 		setMaximumSize(new Dimension(280, 70));
@@ -47,5 +47,17 @@ public class RoomLabel extends JLabel {
 				// TODO userName.equals(name)일 때 프로필 변경 가능. 
 		    }  
 		});
+		
+		// 마우스 over할 때 색 교체
+				this.addMouseListener(new MouseAdapter(){
+				    @Override
+				    public void mouseEntered(MouseEvent e) {
+				        setBackground(new Color(248, 248, 248));
+				    }
+				    @Override
+				    public void mouseExited(MouseEvent e) {
+				        setBackground(Color.WHITE);
+				    }
+				});
 	}
 }
