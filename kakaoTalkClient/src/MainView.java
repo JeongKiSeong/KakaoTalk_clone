@@ -41,13 +41,17 @@ import javax.swing.text.StyledDocument;
 // 친구 목록, 채팅 목록 나오는 화면
 public class MainView extends JFrame {
 	private static final long serialVersionUID = 1L;
-	
+
+	private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private String userName = "";
+	private String userStatus = "상태메시지";
+	private ImageIcon profileImg = profile_default;
 	private List<JLabel> FriendLabelList = new ArrayList<JLabel>();
 	private List<JLabel> RoomLabelList = new ArrayList<JLabel>();
+	private JTextPane friendTextPane;
 	
 	private JFrame mainView;
 	
@@ -75,6 +79,11 @@ public class MainView extends JFrame {
 			oos.flush();
 			ois = new ObjectInputStream(socket.getInputStream());
 			
+			// 접속 시 0번으로 내 정보 전송
+			ChatMsg obcm = new ChatMsg(userName, "0", userStatus);
+			obcm.img = profileImg;
+			SendObject(obcm);
+			
 			ListenNetwork net = new ListenNetwork();
 			net.start();
 
@@ -101,11 +110,32 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
-						msg = String.format("[%s] %s", cm.getId(), cm.getData());
+						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+						System.out.println(msg);
 					} else
 						continue;
 					
 					switch (cm.getCode()) {
+				    // 프로필 재로딩
+					case "0":
+						// "방이름|상태메시지"
+						String data = cm.getData();
+						if (data.equals("### 시작 ###")) { // 시작 신호가 오면 List 비우기
+							FriendLabelList.removeAll(FriendLabelList);
+							// textpane 비우기
+							friendTextPane.setText("");
+						}
+						else if (data.equals("### 끝 ###")) {
+							//끝 신호 받으면 전체 그리기
+							for (JLabel label : FriendLabelList)
+								addComponent(friendTextPane, label);
+						}
+						else {  // 끝 신호가 오기 전까지 계속 add
+							String profile[] = data.split("\\|");
+							FriendLabelList.add(new FriendLabel(cm.img, profile[0], profile[1]));
+						}
+						break;
+					
 					// 31 : 프로필 요청 결과
 					// 
 					case "31":
@@ -131,21 +161,13 @@ public class MainView extends JFrame {
 	}
 	
 
-	// 이름, 코드, 메시지를 서버에 전송
-	public void SendMessage(String name, String code, String msg) {
+	public void SendObject(Object ob) { // 서버로 메세지를 보내는 메소드
 		try {
-			ChatMsg obcm = new ChatMsg(name, code, msg);
-			oos.writeObject(obcm);
+			oos.writeObject(ob);
 		} catch (IOException e) {
-			System.out.println("oos.writeObject() error");
-			try {
-				ois.close();
-				oos.close();
-				socket.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				System.exit(0);
-			}
+			//textArea.append("메세지 송신 에러!!\n");
+			//AppendText("SendObject Error");
+			System.out.println("\"메세지 송신 에러!!");
 		}
 	}
 
@@ -263,23 +285,17 @@ public class MainView extends JFrame {
 			scrollPane.setBorder(null);
 			
 			
-			JTextPane textPane = new JTextPane();
-			scrollPane.add(textPane);
-			textPane.setBackground(Color.WHITE);
-			textPane.setEditable(false);
-			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-			scrollPane.setViewportView(textPane);
-			
-			FriendLabelList.add(new FriendLabel(profile_default, "JKS", "상태메시지"));
-			for (int i=0; i<20; i++)
-				FriendLabelList.add(new FriendLabel(profile_default, "NAME", "STATUS"));
-			for (JLabel label : FriendLabelList)
-				addComponent(textPane, label);
+			friendTextPane = new JTextPane();
+			scrollPane.add(friendTextPane);
+			friendTextPane.setBackground(Color.WHITE);
+			friendTextPane.setEditable(false);
+			friendTextPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+			scrollPane.setViewportView(friendTextPane);
 			
 			
 			// 스크롤 맨 위로 올리기
-			textPane.setSelectionStart(0);
-			textPane.setSelectionEnd(0);
+			friendTextPane.setSelectionStart(0);
+			friendTextPane.setSelectionEnd(0);
 			
 		}		
 	}
