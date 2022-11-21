@@ -46,13 +46,18 @@ public class MainView extends JFrame {
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
-	private String userName = "";
-	private String userStatus = "상태메시지";
+	private String userName = "기본 이름";
+	private String userStatus = "기본 상태메시지";
+	private String userlist = "";
 	private ImageIcon profileImg = profile_default;
-	private List<JLabel> FriendLabelList = new ArrayList<JLabel>();
-	private List<JLabel> RoomLabelList = new ArrayList<JLabel>();
+	private List<FriendLabel> FriendLabelList = new ArrayList<FriendLabel>();
+	private List<RoomLabel> RoomLabelList = new ArrayList<RoomLabel>();
 	private JTextPane friendTextPane;
-	
+	private JTextPane roomTextPane;
+	private FriendPanel friendPanel;
+	private ChatroomPanel chatroomPanel;
+	private JToggleButton friendBtn;
+	private JToggleButton chatroomBtn;
 	private JFrame mainView;
 	
 	
@@ -68,9 +73,9 @@ public class MainView extends JFrame {
 		mainView = this;
 		
 		
-		FriendPanel friendPanel = new FriendPanel(this);
-		ChatroomPanel chatroomPanel = new ChatroomPanel(this);
-		new MenuPanel(this, friendPanel, chatroomPanel);
+		friendPanel = new FriendPanel(this);
+		chatroomPanel = new ChatroomPanel(this);
+		new MenuPanel();
 		
 		try {
 			socket = new Socket(ip_addr, Integer.parseInt(port_no));
@@ -110,8 +115,8 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
-						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-						System.out.println(msg);
+//						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+//						System.out.println(msg);
 					} else
 						continue;
 					
@@ -136,12 +141,18 @@ public class MainView extends JFrame {
 						}
 						break;
 					
-					// 31 : 프로필 요청 결과
-					// 
-					case "31":
-						ImageIcon myProfileImg = cm.img;
-						// appendProfile 함수를 만들어야 하나?
-						// 일단 append로 붙이라고 했으니까. 틀을 만들어야 되잖아.
+					case "60": // 채팅방 번호로 채팅방 레이블 생성
+						if (cm.getId().equals("SERVER-USERLIST")) {
+							userlist = cm.getData();
+							break;
+						}
+						String room_id = cm.getData();
+						// TODO 채팅방 참여자 목록을 받아서 방 이름으로 해야함
+						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
+						RoomLabelList.add(new RoomLabel(profile_default, userlist, "방 번호 : " + room_id, mainView.getLocationOnScreen(), room_id));
+						roomTextPane.setText("");
+						for (JLabel label : RoomLabelList)
+							addComponent(roomTextPane, label);
 						break;
 					}
 				} catch (IOException e) {
@@ -180,14 +191,14 @@ public class MainView extends JFrame {
 		private ImageIcon main_chatroom_clicked = new ImageIcon("./img/main_chatroom_clicked.png");
 		private ButtonGroup btnGroup = new ButtonGroup();
 		
-		public MenuPanel(JFrame frame, FriendPanel friendPanel, ChatroomPanel chatroomPanel) {
-			frame.add(this);
+		public MenuPanel() {
+			mainView.add(this);
 			setBackground(new Color(236, 236, 237));
 			setBounds(0, 0, 70, 591);
 			setLayout(null);
 
 						
-			JToggleButton friendBtn = new JToggleButton(main_friend);
+			friendBtn = new JToggleButton(main_friend);
 			add(friendBtn);
 			friendBtn.setSelected(true);
 			btnGroup.add(friendBtn);
@@ -197,7 +208,7 @@ public class MainView extends JFrame {
 			friendBtn.setBorderPainted(false);
 			friendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			JToggleButton chatroomBtn = new JToggleButton(main_chatroom);
+			chatroomBtn = new JToggleButton(main_chatroom);
 			add(chatroomBtn);
 			btnGroup.add(chatroomBtn);
 			chatroomBtn.setSelectedIcon(main_chatroom_clicked);
@@ -241,6 +252,7 @@ public class MainView extends JFrame {
 		private ImageIcon main_search = new ImageIcon("./img/main_search.png");
 		private ImageIcon main_addFriend = new ImageIcon("./img/main_addFriend.png");
 		private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
+		private ImageIcon main_addChat = new ImageIcon("./img/main_addChat.png");
 		private JTextField textField;
 		private JScrollPane scrollPane;
 		
@@ -265,18 +277,39 @@ public class MainView extends JFrame {
 			textField.setBounds(12, 22, 87, 29);
 			textField.setColumns(10);
 			
-			JButton searchBtn = new JButton(main_search);
-			topPanel.add(searchBtn);
-			searchBtn.setBounds(202, 10, 41, 41);
-			searchBtn.setBorderPainted(false);
-			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//			JButton searchBtn = new JButton(main_search);
+//			topPanel.add(searchBtn);
+//			searchBtn.setBounds(202, 10, 41, 41);
+//			searchBtn.setBorderPainted(false);
+//			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			
-			JButton addFriendBtn = new JButton(main_addFriend);
-			topPanel.add(addFriendBtn);
-			addFriendBtn.setBounds(251, 10, 41, 41);
-			addFriendBtn.setBorderPainted(false);
-			addFriendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//			JButton addFriendBtn = new JButton(main_addFriend);
+//			topPanel.add(addFriendBtn);
+//			addFriendBtn.setBounds(251, 10, 41, 41);
+//			addFriendBtn.setBorderPainted(false);
+//			addFriendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			
+			JButton addRoomBtn = new JButton(main_addChat);
+			topPanel.add(addRoomBtn);
+			addRoomBtn.setBounds(251, 10, 41, 41);
+			addRoomBtn.setBorderPainted(false);
+			addRoomBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			// 채팅 추가 버튼 클릭 이벤트
+			addRoomBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String userList = "";
+					for (FriendLabel label : FriendLabelList) {
+						if (label.isSelected())
+							userList += label.getName() + "|";
+					}
+					ChatMsg obcm = new ChatMsg(userName, "60", userList);
+					SendObject(obcm);
+					
+					chatroomBtn.doClick(); // 채팅목록으로 변경
+				}
+			});
 			
 			
 			scrollPane = new JScrollPane();
@@ -335,39 +368,39 @@ public class MainView extends JFrame {
 			textField.setBounds(12, 22, 87, 29);
 			textField.setColumns(10);
 			
-			JButton searchBtn = new JButton(main_search);
-			topPanel.add(searchBtn);
-			searchBtn.setBounds(202, 10, 41, 41);
-			searchBtn.setBorderPainted(false);
-			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//			JButton searchBtn = new JButton(main_search);
+//			topPanel.add(searchBtn);
+//			searchBtn.setBounds(202, 10, 41, 41);
+//			searchBtn.setBorderPainted(false);
+//			searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			JButton addChatBtn = new JButton(main_addChat);
-			topPanel.add(addChatBtn);
-			addChatBtn.setBounds(251, 10, 41, 41);
-			addChatBtn.setBorderPainted(false);
-			addChatBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//			JButton addChatBtn = new JButton(main_addChat);
+//			topPanel.add(addChatBtn);
+//			addChatBtn.setBounds(251, 10, 41, 41);
+//			addChatBtn.setBorderPainted(false);
+//			addChatBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			scrollPane = new JScrollPane();
 			add(scrollPane);
 			scrollPane.setBounds(0, 70, 304, 520);
 			scrollPane.setBorder(null);
 			
-			JTextPane textPane = new JTextPane();
-			scrollPane.add(textPane);
-			textPane.setBackground(Color.WHITE);
-			textPane.setEditable(false);
-			textPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-			scrollPane.setViewportView(textPane);
+			roomTextPane = new JTextPane();
+			scrollPane.add(roomTextPane);
+			roomTextPane.setBackground(Color.WHITE);
+			roomTextPane.setEditable(false);
+			roomTextPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+			scrollPane.setViewportView(roomTextPane);
 
-			RoomLabelList.add(new RoomLabel(profile_default, "홍길동", "아버지!", mainView.getLocationOnScreen(), "1"));
-			for (int i=0; i<20; i++)
-				RoomLabelList.add(new RoomLabel(profile_default, "채팅방 이름", "마지막 대화 내용", mainView.getLocationOnScreen(), "1"));
-			for (JLabel label : RoomLabelList)
-				addComponent(textPane, label);
+//			RoomLabelList.add(new RoomLabel(profile_default, "홍길동", "아버지!", mainView.getLocationOnScreen(), "1"));
+//			for (int i=0; i<20; i++)
+//				RoomLabelList.add(new RoomLabel(profile_default, "채팅방 이름", "마지막 대화 내용", mainView.getLocationOnScreen(), "1"));
+//			for (JLabel label : RoomLabelList)
+//				addComponent(textPane, label);
 
 			// 스크롤 맨 위로 올리기
-			textPane.setSelectionStart(0);
-			textPane.setSelectionEnd(0);
+			roomTextPane.setSelectionStart(0);
+			roomTextPane.setSelectionEnd(0);
 		}
 
 	}

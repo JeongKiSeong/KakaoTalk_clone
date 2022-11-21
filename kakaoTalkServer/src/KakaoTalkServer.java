@@ -28,11 +28,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 
 public class KakaoTalkServer extends JFrame {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
 	private JPanel contentPane;
 	JTextArea textArea;
 	private JTextField txtPortNumber;
@@ -40,7 +37,7 @@ public class KakaoTalkServer extends JFrame {
 	private ServerSocket socket; // 서버소켓
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
-	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
+	private int roomNum = 0; // 방 번호 배정용
 
 	/**
 	 * Launch the application.
@@ -243,7 +240,7 @@ public class KakaoTalkServer extends JFrame {
 						continue;
 					switch(cm.getCode()) {
 					case "0": // 접속 알림
-						// 접속한 유저 정보 저장
+						// 접속한 유저 정보를 저장
 						this.UserName = cm.getId();
 						this.UserStatus = cm.getData();
 						this.ProfileImg = cm.img;
@@ -251,6 +248,28 @@ public class KakaoTalkServer extends JFrame {
 						// 새 유저가 접속하면 다른 유저에게 프로필 목록을 전송
 						ReloadProfile();
 						break;
+						
+					case "60": // 채팅방 생성 요청
+						String userlist = "";
+						String userList[] = cm.getData().split("\\|");
+						for (String name : userList) {
+							userlist += (name + ", ");
+						}
+						userlist = userlist.substring(0, userlist.length() - 2);
+						
+						for (String userName : userList) {
+							// 채팅방 참여자들에게 방 번호 전송
+							for (int i = 0; i < user_vc.size(); i++) {
+								UserService user = (UserService) user_vc.elementAt(i);
+								if (user.UserName.equals(userName)) { 
+									ChatMsg ul = new ChatMsg("SERVER-USERLIST","60", userlist);
+									user.WriteOneObject(ul);
+									ChatMsg ob = new ChatMsg("SERVER","60", Integer.toString(roomNum));
+									user.WriteOneObject(ob);
+								}
+							}
+						}
+						roomNum++;
 					}
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");

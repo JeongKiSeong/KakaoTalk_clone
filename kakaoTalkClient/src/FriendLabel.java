@@ -1,5 +1,6 @@
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,14 +15,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class FriendLabel extends JLabel {
-	public FriendLabel() {
-	}
 	private static final long serialVersionUID = 1L;
 	
 	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
 	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
+	private JCheckBox checkbox;
+	private String userName; 
 	
 	public FriendLabel(ImageIcon img, String bigText, String smallText) {
+		this.userName = bigText;
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -45,9 +47,14 @@ public class FriendLabel extends JLabel {
 		smallTextLabel.setBounds(80, 35, 180, 20);
 		
 		// TODO 온라인 -> 초록불, 오프라인 -> 파란불
-		JLabel StatusLabel = new JLabel(status_green);
-		this.add(StatusLabel);
-		StatusLabel.setBounds(260, 30, 10, 10);
+//		JLabel StatusLabel = new JLabel(status_green);
+//		this.add(StatusLabel);
+//		StatusLabel.setBounds(260, 30, 10, 10);
+		
+		checkbox = new JCheckBox();
+		this.add(checkbox);
+		checkbox.setBounds(260, 25, 20, 20);
+		checkbox.setBackground(Color.WHITE);
 		
 		// 클릭 시 프로필 프레임 생성
 		this.addMouseListener(new MouseAdapter() {
@@ -67,10 +74,12 @@ public class FriendLabel extends JLabel {
 		    @Override
 		    public void mouseEntered(MouseEvent e) {
 		        setBackground(new Color(248, 248, 248));
+		        checkbox.setBackground(new Color(248, 248, 248));
 		    }
 		    @Override
 		    public void mouseExited(MouseEvent e) {
 		        setBackground(Color.WHITE);
+		        checkbox.setBackground(Color.WHITE);
 		    }
 		});
 	}
@@ -136,5 +145,18 @@ public class FriendLabel extends JLabel {
 				add(jprofile);
 			}
 		}
+	}
+	
+	// 체크박스 확인 메소드
+	public boolean isSelected() {
+		boolean isSel = checkbox.isSelected();
+		if (isSel)
+			checkbox.doClick();
+		return isSel;
+	}
+	
+	// get userName
+	public String getName() {
+		return userName;
 	}
 }
