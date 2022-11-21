@@ -174,6 +174,7 @@ public class KakaoTalkServer extends JFrame {
 
 		public void Logout() {
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
+			ReloadProfile();
 		}
 
 		// 모든 User들에게 Object를 방송. 채팅 message와 image object를 보낼 수 있다

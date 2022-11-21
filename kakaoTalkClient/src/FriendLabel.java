@@ -8,6 +8,7 @@ import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -98,20 +99,42 @@ public class FriendLabel extends JLabel {
 			JLabel nameLabel = new JLabel(name);
 			panel.add(nameLabel);
 			nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-			nameLabel.setBounds(100, 143, 90, 34);
+			nameLabel.setBounds(100, 133, 90, 34);
 			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 			JLabel statusLabel = new JLabel(status);
 			panel.add(statusLabel);
-			statusLabel.setLocation(58, 187);
-			statusLabel.setSize(172, 29);
+			statusLabel.setBounds(58, 177, 172, 29);
 			statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
 			// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
+			imgLabel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent  e) {
+					Point location = getLocationOnScreen();
+					new ProfileZoom(profile).setLocation(location.x + getWidth() + 20, location.y);
+					//frame.setVisible(false);
+				}
+			});
+		}
+		public class ProfileZoom extends JFrame {
+			public ProfileZoom(ImageIcon profile) {
+				setTitle("프로필");
+				setSize(300, 300);
+				setVisible(true);
+				
+				Image img = profile.getImage();
+				// 창의 사이즈인 300, 300에 맞춰서 이미지를 변경
+				Image changeImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+				ImageIcon changeIcon = new ImageIcon(changeImg);
+				
+				JLabel jprofile=new JLabel(changeIcon);
+				add(jprofile);
+			}
 		}
 	}
 }
