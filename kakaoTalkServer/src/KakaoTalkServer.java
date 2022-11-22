@@ -38,6 +38,7 @@ public class KakaoTalkServer extends JFrame {
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
 	private int roomNum = 0; // 방 번호 배정용
+	
 
 	/**
 	 * Launch the application.
