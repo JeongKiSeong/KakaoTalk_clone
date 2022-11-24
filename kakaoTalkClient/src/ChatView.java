@@ -103,6 +103,7 @@ public class ChatView extends JFrame {
 				// msg = String.format("[%s] %s\n", UserName, txtInput.getText());
 				msg = textField.getText();
 				//SendMessage(msg);
+				
 				System.out.println(msg);
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다

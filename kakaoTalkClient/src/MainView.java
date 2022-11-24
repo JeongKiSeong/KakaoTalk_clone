@@ -115,8 +115,8 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
-//						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-//						System.out.println(msg);
+						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+						System.out.println(msg);
 					} else
 						continue;
 					
