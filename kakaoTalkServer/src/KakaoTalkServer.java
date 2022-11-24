@@ -182,6 +182,7 @@ public class KakaoTalkServer extends JFrame {
 			}
 		}
 		
+		
 		public void WriteOneObject(Object ob) {
 			try {
 			    oos.writeObject(ob);
@@ -250,26 +251,26 @@ public class KakaoTalkServer extends JFrame {
 						break;
 						
 					case "60": // 채팅방 생성 요청
-						String userlist = "";
-						String userList[] = cm.getData().split("\\|");
-						for (String name : userList) {
-							userlist += (name + ", ");
-						}
-						userlist = userlist.substring(0, userlist.length() - 2);
-						
+						String userList[] = cm.userlist.split(" ");
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
 							for (int i = 0; i < user_vc.size(); i++) {
 								UserService user = (UserService) user_vc.elementAt(i);
 								if (user.UserName.equals(userName)) { 
-									ChatMsg ul = new ChatMsg("SERVER-USERLIST","60", userlist);
-									user.WriteOneObject(ul);
-									ChatMsg ob = new ChatMsg("SERVER","60", Integer.toString(roomNum));
+									ChatMsg ob = new ChatMsg("SERVER","60", "NULL");
+									ob.userlist = cm.userlist;
+									ob.room_id = Integer.toString(roomNum);
 									user.WriteOneObject(ob);
 								}
 							}
 						}
 						roomNum++;
+						break;
+						
+						
+					case "200": // 일반 메시지
+						WriteAllObject(cm);
+						break;
 					}
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");

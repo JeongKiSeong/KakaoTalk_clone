@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 
-	public RoomLabel(ImageIcon img, String bigText, String smallText, Point p, String room_id) {
+	public RoomLabel(MainView mainView, ImageIcon img, String bigText, String smallText, String room_id) {
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -40,12 +40,13 @@ public class RoomLabel extends JLabel {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
 		    {  
-				JFrame frame = new ChatView(p, room_id, bigText);
-				frame.setLocation(p.x + getWidth() + 100, p.y);
-				
-				// TODO 프로필 변경 패널?
-				// TODO userName.equals(name)일 때 프로필 변경 가능. 
-		    }  
+				// Double Clicked
+				 if(e.getClickCount()==2) {
+					JFrame frame = new ChatView(mainView, room_id, bigText);
+					Point p = mainView.getLocationOnScreen();
+					frame.setLocation(p.x + getWidth() + 100, p.y);
+				 }
+		    }
 		});
 		
 		// 마우스 over할 때 색 교체
