@@ -1,13 +1,17 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -15,7 +19,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
 
 public class ChatView extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -35,11 +38,13 @@ public class ChatView extends JFrame {
 	private String room_id;
 	private Frame frame;
 	private FileDialog fd;
+	private ChatView chatView;
 	
 	
 	public ChatView(MainView mainView, String room_id, String room_name) {
 		this.mainView = mainView;
 		this.room_id = room_id;
+		chatView = this;
 		// mainView 오른쪽에 나오도록
 		Point p = mainView.getLocationOnScreen();
 		setBounds(p.x + 380, p.y, 390, 630);
@@ -155,6 +160,7 @@ public class ChatView extends JFrame {
 		int len = textPane.getDocument().getLength();
 		textPane.setCaretPosition(len); // place caret at the end (with no selection)
 		Image ori_img = ori_icon.getImage();
+		ImageIcon icon;
 		int width, height;
 		double ratio;
 		width = ori_icon.getIconWidth();
@@ -171,13 +177,31 @@ public class ChatView extends JFrame {
 				width = (int) (height * ratio);
 			}
 			Image new_img = ori_img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-			ImageIcon new_icon = new ImageIcon(new_img);
-			textPane.insertIcon(new_icon);
+			icon = new ImageIcon(new_img);
 		} else
-			textPane.insertIcon(ori_icon);
-		addComponent(textPane, null);
-		// ImageViewAction viewaction = new ImageViewAction();
-		// new_icon.addActionListener(viewaction); // 내부클래스로 액션 리스너를 상속받은 클래스로
+			icon = ori_icon;
+		
+		JLabel img = new JLabel(icon);
+		addComponent(textPane, img);
+		
+		// 클릭 시 프로필 프레임 생성
+		img.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e)  
+		    {  
+				JFrame f = new JFrame(); //creates jframe f
+				f.setResizable(false);
+		        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //this is your screen size
+		        ImageIcon image = icon; //imports the image
+		        JLabel lbl = new JLabel(image); //puts the image into a jlabel
+		        f.getContentPane().add(lbl); //puts label inside the jframe
+		        f.setSize(300, 300); //gets h and w of image and sets jframe to the size
+		        Point p = img.getLocationOnScreen();
+		        Point p2 = chatView.getLocationOnScreen();
+		        f.setLocation(p2.x + 390, p.y - 65); //sets the location of the jframe
+		        f.setVisible(true); //makes the jframe visible
+		    }  
+		});
+		
 	}
 	
 	// keyboard enter key 치면 서버로 전송

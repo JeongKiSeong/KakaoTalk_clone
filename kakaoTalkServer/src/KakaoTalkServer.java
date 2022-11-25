@@ -275,7 +275,7 @@ public class KakaoTalkServer extends JFrame {
 						sendToRoomUser(cm);
 						break;
 						
-					case "210":
+					case "210": // »çÁø
 						sendToRoomUser(cm);
 						break;
 					}
