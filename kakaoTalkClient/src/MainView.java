@@ -165,7 +165,6 @@ public class MainView extends JFrame {
 						
 					// 일반 메시지
 					case "200":
-						// TODO AppendText 함수 만들어서 사용
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
 								// 내가 보낸 메시지
@@ -173,11 +172,26 @@ public class MainView extends JFrame {
 									roomLabel.getChatView().AppendTextRight(cm.getData());
 								}
 								else {
-									roomLabel.getChatView().AppendTextLeft(cm.img, cm.getId(), cm.getData());
+									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData());
 								}
 							}
 						}
-							
+						break;
+						
+					// 사진
+					case "210":
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								// 내가 보낸 메시지
+								if (cm.getId().equals(userName)) {
+									roomLabel.getChatView().AppendImageRight(cm.img);
+								}
+								else {
+									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img);
+								}
+							}
+						}
+						break;							
 					}
 				} catch (IOException e) {
 					try {

@@ -1,7 +1,10 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.FileDialog;
 import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +16,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+
 public class ChatView extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTextField textField;
@@ -21,11 +25,17 @@ public class ChatView extends JFrame {
 	private ImageIcon chat_emote_clicked = new ImageIcon("./img/chat_emote_clicked.png");
 	private ImageIcon chat_file_clicked = new ImageIcon("./img/chat_file_clicked.png");
 	private ImageIcon chat_send = new ImageIcon("./img/chat_send.png");
+	private ImageIcon chat_img_clicked = new ImageIcon("./img/chat_img.png");
+	private ImageIcon chat_img = new ImageIcon("./img/chat_img_clicked.png");
 	
 	private JButton sendBtn;
+	private JButton imgBtn;
 	private JTextPane textPane;
 	private MainView mainView;
 	private String room_id;
+	private Frame frame;
+	private FileDialog fd;
+	
 	
 	public ChatView(MainView mainView, String room_id, String room_name) {
 		this.mainView = mainView;
@@ -95,6 +105,15 @@ public class ChatView extends JFrame {
 		fileBtn.setBorderPainted(false);
 		fileBtn.setBounds(52, 3, 37, 37);
 		fileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		// 사진 버튼
+		imgBtn = new JButton(chat_img);
+		chatOptionPanel.add(imgBtn);
+		imgBtn.setRolloverIcon(chat_img_clicked);
+		imgBtn.setBorderPainted(false);
+		imgBtn.setBounds(96, 3, 37, 37);
+		imgBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		imgBtn.addActionListener(new ImageSendAction());
 			
 		// 채팅창 이름, 채팅창 사진이 있는 패널
 		JPanel chatInfoPanel = new JPanel();
@@ -118,6 +137,49 @@ public class ChatView extends JFrame {
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
+	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon) {
+		SetLeftAlign();
+		textPane.insertComponent(new MsgStatusPanel(profile, name));
+		addComponent(textPane, null);
+		AppendImage(ori_icon);
+		textPane.setCaretPosition(textPane.getDocument().getLength());
+	}
+	
+	public void AppendImageRight(ImageIcon ori_icon) {
+		SetRightAlign();
+		AppendImage(ori_icon);
+		textPane.setCaretPosition(textPane.getDocument().getLength());
+	}
+	
+	public void AppendImage(ImageIcon ori_icon) {
+		int len = textPane.getDocument().getLength();
+		textPane.setCaretPosition(len); // place caret at the end (with no selection)
+		Image ori_img = ori_icon.getImage();
+		int width, height;
+		double ratio;
+		width = ori_icon.getIconWidth();
+		height = ori_icon.getIconHeight();
+		// Image가 너무 크면 최대 가로 또는 세로 200 기준으로 축소시킨다.
+		if (width > 200 || height > 200) {
+			if (width > height) { // 가로 사진
+				ratio = (double) height / width;
+				width = 200;
+				height = (int) (width * ratio);
+			} else { // 세로 사진
+				ratio = (double) width / height;
+				height = 200;
+				width = (int) (height * ratio);
+			}
+			Image new_img = ori_img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			ImageIcon new_icon = new ImageIcon(new_img);
+			textPane.insertIcon(new_icon);
+		} else
+			textPane.insertIcon(ori_icon);
+		addComponent(textPane, null);
+		// ImageViewAction viewaction = new ImageViewAction();
+		// new_icon.addActionListener(viewaction); // 내부클래스로 액션 리스너를 상속받은 클래스로
+	}
+	
 	// keyboard enter key 치면 서버로 전송
 	class TextSendAction implements ActionListener {
 		@Override
@@ -130,7 +192,7 @@ public class ChatView extends JFrame {
 					return;
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "200", msg);
 				cm.room_id = room_id;
-				cm.img = mainView.getProfile();
+				cm.profile = mainView.getProfile();
 				mainView.sendObject(cm);
 				
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
@@ -138,6 +200,24 @@ public class ChatView extends JFrame {
 			}
 		}
 	}
+	
+	// 사진 선택 후 전송
+		class ImageSendAction implements ActionListener {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// 액션 이벤트가 sendBtn일때 또는 textField 에세 Enter key 치면
+				if (e.getSource() == imgBtn) {
+					frame = new Frame("이미지첨부");
+					fd = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
+					fd.setVisible(true);
+					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "210", "IMG");
+					obcm.room_id = room_id;
+					obcm.img = new ImageIcon(fd.getDirectory() + fd.getFile());
+					obcm.profile = mainView.getProfile();
+					mainView.sendObject(obcm);
+				}
+			}
+		}
 	
 	// JTextPane에 컴포넌트 추가하는 함수
 	public void addComponent(JTextPane textPane, Component component) {
@@ -173,4 +253,5 @@ public class ChatView extends JFrame {
         
         doc.setParagraphAttributes(doc.getLength(), 1, left, false);
 	}
+	
 }
