@@ -38,7 +38,8 @@ public class KakaoTalkServer extends JFrame {
 	private ServerSocket socket; // 서버소켓
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private Vector<UserService> UserVec = new Vector<UserService>(); // 연결된 사용자를 저장할 벡터
-	private Vector<RoomData> RoomVec = new Vector<RoomData>(); // 연결된 사용자를 저장할 벡터
+	private Vector<RoomData> RoomVec = new Vector<RoomData>();
+	private Vector<ChatMsg> ChatVec = new Vector<ChatMsg>();
 	private int roomNum = 0; // 방 번호 배정용
 
 	/**
@@ -252,6 +253,24 @@ public class KakaoTalkServer extends JFrame {
 						ReloadProfile();
 						break;
 						
+					case "10": // 채팅방 입장 신호 -> 채팅메시지 로딩
+						UserService us = null;
+						for (int i = 0; i < user_vc.size(); i++) {
+							UserService user = user_vc.elementAt(i);
+							if (user.UserName.equals(cm.getId())) { 
+								us = user;
+								break;
+							}
+						}
+						for (int i = 0; i < ChatVec.size(); i++) {
+							ChatMsg chatMsg = ChatVec.elementAt(i);
+							if (cm.room_id.equals(chatMsg.room_id))
+								// 이러면 시간이 같은데.. 시간을 빼야하나?
+								us.WriteOneObject(chatMsg);
+							//sendToRoomUser 사용하니까 같은 방 사람도 받아짐
+						}
+						break;
+						
 					case "60": // 채팅방 생성 요청
 						String userList[] = cm.getData().split(" ");
 						for (String userName : userList) {
@@ -272,10 +291,12 @@ public class KakaoTalkServer extends JFrame {
 						
 						
 					case "200": // 일반 메시지
+						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
 						
 					case "210": // 사진
+						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
 					}

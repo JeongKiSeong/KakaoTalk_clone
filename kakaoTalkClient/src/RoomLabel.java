@@ -55,6 +55,12 @@ public class RoomLabel extends JLabel {
 					chatView = new ChatView(mainView, room_id, roomName);
 					Point p = mainView.getLocationOnScreen();
 					chatView.setLocation(p.x + getWidth() + 100, p.y);
+					
+					// 서버에 입장 신호를 줘서 데이터 로딩
+					String msg = String.format("[%s] %s", mainView.getUserName(), room_id + "번 방에 입장");
+					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "10", msg);
+					obcm.room_id = room_id;
+					mainView.sendObject(obcm);
 				 }
 		    }
 		});
