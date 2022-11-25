@@ -46,22 +46,34 @@ public class MainView extends JFrame {
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
+	
 	private String userName = "기본 이름";
 	private String userStatus = "기본 상태메시지";
-	private String userlist = "";
 	private ImageIcon profileImg = profile_default;
+	
 	private List<FriendLabel> FriendLabelList = new ArrayList<FriendLabel>();
 	private List<RoomLabel> RoomLabelList = new ArrayList<RoomLabel>();
+	
 	private JTextPane friendTextPane;
 	private JTextPane roomTextPane;
 	private FriendPanel friendPanel;
 	private ChatroomPanel chatroomPanel;
 	private JToggleButton friendBtn;
 	private JToggleButton chatroomBtn;
-	private JFrame mainView;
+	
+	private MainView mainView;
+	
+
+	public String getUserName() {
+		return userName;
+	}
+	public ImageIcon getProfile() {
+		return profileImg;
+	}
 	
 	
 	public MainView(String username, String ip_addr, String port_no) {
+		mainView = this;
 		userName = username;
 		setBounds(100, 100, 390, 630);
 		getContentPane().setLayout(null);
@@ -70,9 +82,6 @@ public class MainView extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		mainView = this;
-		
-		
 		friendPanel = new FriendPanel(this);
 		chatroomPanel = new ChatroomPanel(this);
 		new MenuPanel();
@@ -87,7 +96,7 @@ public class MainView extends JFrame {
 			// 접속 시 0번으로 내 정보 전송
 			ChatMsg obcm = new ChatMsg(userName, "0", userStatus);
 			obcm.img = profileImg;
-			SendObject(obcm);
+			sendObject(obcm);
 			
 			ListenNetwork net = new ListenNetwork();
 			net.start();
@@ -115,7 +124,11 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
+<<<<<<< HEAD
 						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+=======
+ 						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+>>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
 						System.out.println(msg);
 					} else
 						continue;
@@ -132,8 +145,14 @@ public class MainView extends JFrame {
 						}
 						else if (data.equals("### 끝 ###")) {
 							//끝 신호 받으면 전체 그리기
-							for (JLabel label : FriendLabelList)
-								addComponent(friendTextPane, label);
+							for (FriendLabel label : FriendLabelList)
+								// 내 프로필을 상단에
+								if (label.getUserName().equals(userName))
+									addComponent(friendTextPane, label);
+							
+							for (FriendLabel label : FriendLabelList)
+								if (!label.getUserName().equals(userName))
+									addComponent(friendTextPane, label);
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
@@ -142,18 +161,41 @@ public class MainView extends JFrame {
 						break;
 					
 					case "60": // 채팅방 번호로 채팅방 레이블 생성
-						if (cm.getId().equals("SERVER-USERLIST")) {
-							userlist = cm.getData();
-							break;
-						}
-						String room_id = cm.getData();
-						// TODO 채팅방 참여자 목록을 받아서 방 이름으로 해야함
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
-						RoomLabelList.add(new RoomLabel(profile_default, userlist, "방 번호 : " + room_id, mainView.getLocationOnScreen(), room_id));
-						roomTextPane.setText("");
-						for (JLabel label : RoomLabelList)
-							addComponent(roomTextPane, label);
+						RoomLabel rl = new RoomLabel(mainView, profile_default, cm.userlist, "방 번호 : " + cm.room_id, cm.room_id);
+						RoomLabelList.add(rl);
+						addComponent(roomTextPane, rl);
 						break;
+						
+					// 일반 메시지
+					case "200":
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								// 내가 보낸 메시지
+								if (cm.getId().equals(userName)) {
+									roomLabel.getChatView().AppendTextRight(cm.getData());
+								}
+								else {
+									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData());
+								}
+							}
+						}
+						break;
+						
+					// 사진
+					case "210":
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								// 내가 보낸 메시지
+								if (cm.getId().equals(userName)) {
+									roomLabel.getChatView().AppendImageRight(cm.img);
+								}
+								else {
+									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img);
+								}
+							}
+						}
+						break;							
 					}
 				} catch (IOException e) {
 					try {
@@ -170,15 +212,13 @@ public class MainView extends JFrame {
 			}
 		}
 	}
-	
 
-	public void SendObject(Object ob) { // 서버로 메세지를 보내는 메소드
+
+	public void sendObject(Object ob) { // 서버로 메세지를 보내는 메소드
 		try {
 			oos.writeObject(ob);
 		} catch (IOException e) {
-			//textArea.append("메세지 송신 에러!!\n");
-			//AppendText("SendObject Error");
-			System.out.println("\"메세지 송신 에러!!");
+			System.out.println("메세지 송신 에러!!");
 		}
 	}
 
@@ -299,15 +339,20 @@ public class MainView extends JFrame {
 			addRoomBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					int count = 0;
 					String userList = "";
 					for (FriendLabel label : FriendLabelList) {
-						if (label.isSelected())
-							userList += label.getName() + "|";
+						if (label.isSelected()) {
+							count++;
+							userList += label.getUserName() + " ";
+						}
 					}
-					ChatMsg obcm = new ChatMsg(userName, "60", userList);
-					SendObject(obcm);
-					
-					chatroomBtn.doClick(); // 채팅목록으로 변경
+					if (count != 0) { // 선택한 사람이 있을 때만 채팅방 생성
+						ChatMsg obcm = new ChatMsg(userName, "60", userList);
+						sendObject(obcm);
+						
+						chatroomBtn.doClick(); // 채팅목록으로 변경
+					}
 				}
 			});
 			
@@ -391,13 +436,7 @@ public class MainView extends JFrame {
 			roomTextPane.setEditable(false);
 			roomTextPane.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			scrollPane.setViewportView(roomTextPane);
-
-//			RoomLabelList.add(new RoomLabel(profile_default, "홍길동", "아버지!", mainView.getLocationOnScreen(), "1"));
-//			for (int i=0; i<20; i++)
-//				RoomLabelList.add(new RoomLabel(profile_default, "채팅방 이름", "마지막 대화 내용", mainView.getLocationOnScreen(), "1"));
-//			for (JLabel label : RoomLabelList)
-//				addComponent(textPane, label);
-
+			
 			// 스크롤 맨 위로 올리기
 			roomTextPane.setSelectionStart(0);
 			roomTextPane.setSelectionEnd(0);

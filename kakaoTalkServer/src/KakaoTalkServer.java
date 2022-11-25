@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -36,7 +37,8 @@ public class KakaoTalkServer extends JFrame {
 
 	private ServerSocket socket; // 서버소켓
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
-	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
+	private Vector<UserService> UserVec = new Vector<UserService>(); // 연결된 사용자를 저장할 벡터
+	private Vector<RoomData> RoomVec = new Vector<RoomData>(); // 연결된 사용자를 저장할 벡터
 	private int roomNum = 0; // 방 번호 배정용
 	
 
@@ -151,7 +153,7 @@ public class KakaoTalkServer extends JFrame {
 		private ObjectOutputStream oos;
 
 		private Socket client_socket;
-		private Vector user_vc;
+		private Vector<UserService> user_vc;
 		public String UserName = "";
 		public String UserStatus;
 		public ImageIcon ProfileImg;
@@ -178,10 +180,11 @@ public class KakaoTalkServer extends JFrame {
 		// 모든 User들에게 Object를 방송. 채팅 message와 image object를 보낼 수 있다
 		public void WriteAllObject(Object ob) {
 			for (int i = 0; i < user_vc.size(); i++) {
-				UserService user = (UserService) user_vc.elementAt(i);
+				UserService user = user_vc.elementAt(i);
 				user.WriteOneObject(ob);
 			}
 		}
+		
 		
 		public void WriteOneObject(Object ob) {
 			try {
@@ -207,7 +210,7 @@ public class KakaoTalkServer extends JFrame {
 		public void ReloadProfile() {
 			WriteAllObject(new ChatMsg("SERVER", "0", "### 시작 ###"));
 			for (int i = 0; i < user_vc.size(); i++) {
-				UserService user = (UserService) user_vc.elementAt(i);
+				UserService user = user_vc.elementAt(i);
 				AppendText("프로필 전송 중 : " + user.UserName);
 				String message = user.UserName + '|' + user.UserStatus;
 				ChatMsg send = new ChatMsg("SERVER", "0", message);
@@ -251,26 +254,31 @@ public class KakaoTalkServer extends JFrame {
 						break;
 						
 					case "60": // 채팅방 생성 요청
-						String userlist = "";
-						String userList[] = cm.getData().split("\\|");
-						for (String name : userList) {
-							userlist += (name + ", ");
-						}
-						userlist = userlist.substring(0, userlist.length() - 2);
-						
+						String userList[] = cm.getData().split(" ");
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
 							for (int i = 0; i < user_vc.size(); i++) {
-								UserService user = (UserService) user_vc.elementAt(i);
+								UserService user = user_vc.elementAt(i);
 								if (user.UserName.equals(userName)) { 
-									ChatMsg ul = new ChatMsg("SERVER-USERLIST","60", userlist);
-									user.WriteOneObject(ul);
-									ChatMsg ob = new ChatMsg("SERVER","60", Integer.toString(roomNum));
+									ChatMsg ob = new ChatMsg("SERVER","60", "Making Room");
+									ob.userlist = cm.getData();
+									ob.room_id = Integer.toString(roomNum);
 									user.WriteOneObject(ob);
 								}
 							}
 						}
+						RoomVec.add(new RoomData(Integer.toString(roomNum), userList));
 						roomNum++;
+						break;
+						
+						
+					case "200": // 일반 메시지
+						sendToRoomUser(cm);
+						break;
+						
+					case "210": // 사진
+						sendToRoomUser(cm);
+						break;
 					}
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");
@@ -286,6 +294,23 @@ public class KakaoTalkServer extends JFrame {
 				} // 바깥 catch문끝
 			} // while
 		} // run
+		
+		public void sendToRoomUser(ChatMsg cm) {
+			for (int i = 0; i < RoomVec.size(); i++) {
+				RoomData room = RoomVec.elementAt(i);
+				if (cm.room_id.equals(room.getRoom_id())) {
+					for (String userName : room.getUserlist()) {
+						for (int j = 0; j < user_vc.size(); j++) {
+							UserService user = user_vc.elementAt(j);
+							if (user.UserName.equals(userName)) { 
+								user.WriteOneObject(cm);
+							}
+						} 
+					}
+				}
+			}
+		}
+		
 	}
 
 }
