@@ -169,10 +169,10 @@ public class MainView extends JFrame {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendTextRight(cm.getData());
+									roomLabel.getChatView().AppendTextRight(cm.getData(), cm.time);
 								}
 								else {
-									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData());
+									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), cm.time);
 								}
 							}
 						}
@@ -184,10 +184,10 @@ public class MainView extends JFrame {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendImageRight(cm.img);
+									roomLabel.getChatView().AppendImageRight(cm.img, cm.time);
 								}
 								else {
-									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img);
+									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img, cm.time);
 								}
 							}
 						}

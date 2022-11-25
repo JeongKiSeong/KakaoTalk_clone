@@ -1,7 +1,6 @@
 import javax.swing.JPanel;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,9 +18,8 @@ import javax.swing.JLabel;
 
 // ¿ÃπÃ¡ˆ ≈©±‚ : (40, 40)
 public class MsgStatusPanel extends JPanel {
-	private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
-
-	public MsgStatusPanel(ImageIcon profile, String name) {
+	
+	public MsgStatusPanel(ImageIcon profile, String name, String time) {
 		setLayout(null);
 		setBackground(new Color(186, 206, 224));
 		setBounds(0, 0, 170, 60);
@@ -42,11 +40,7 @@ public class MsgStatusPanel extends JPanel {
 		add(timeLabel);
 		timeLabel.setBounds(48, 28, 77, 25);
 		
-		String format = "aa hh:mm";
-		Calendar today = Calendar.getInstance();
-
-		SimpleDateFormat type = new SimpleDateFormat(format);
-		timeLabel.setText(type.format(today.getTime()));
+		timeLabel.setText(time);
 		timeLabel.setFont(new Font("∏º¿∫ ∞ÌµÒ", Font.PLAIN, 12));
 		
 	}

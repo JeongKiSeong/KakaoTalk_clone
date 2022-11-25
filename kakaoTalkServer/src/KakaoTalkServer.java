@@ -265,9 +265,7 @@ public class KakaoTalkServer extends JFrame {
 						for (int i = 0; i < ChatVec.size(); i++) {
 							ChatMsg chatMsg = ChatVec.elementAt(i);
 							if (cm.room_id.equals(chatMsg.room_id))
-								// 이러면 시간이 같은데.. 시간을 빼야하나?
 								us.WriteOneObject(chatMsg);
-							//sendToRoomUser 사용하니까 같은 방 사람도 받아짐
 						}
 						break;
 						

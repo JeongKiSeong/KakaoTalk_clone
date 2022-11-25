@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -128,29 +130,29 @@ public class ChatView extends JFrame {
 		
 	}
 	
-	public void AppendTextLeft(ImageIcon profile, String name, String text) {
+	public void AppendTextLeft(ImageIcon profile, String name, String text, String time) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel(profile, name));
+		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
 		addComponent(textPane, null);
 		addComponent(textPane, new MsgLabel(text, "L"));
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendTextRight(String text) {
+	public void AppendTextRight(String text, String time) {
 		SetRightAlign();
 		addComponent(textPane, new MsgLabel(text, "R"));
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon) {
+	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon, String time) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel(profile, name));
+		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
 		addComponent(textPane, null);
 		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendImageRight(ImageIcon ori_icon) {
+	public void AppendImageRight(ImageIcon ori_icon, String time) {
 		SetRightAlign();
 		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -217,8 +219,13 @@ public class ChatView extends JFrame {
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "200", msg);
 				cm.room_id = room_id;
 				cm.profile = mainView.getProfile();
-				mainView.sendObject(cm);
 				
+				String format = "aa hh:mm";
+				Calendar today = Calendar.getInstance();
+				SimpleDateFormat type = new SimpleDateFormat(format);
+				cm.time = type.format(today.getTime());
+				
+				mainView.sendObject(cm);				
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
 			}
@@ -234,11 +241,17 @@ public class ChatView extends JFrame {
 					frame = new Frame("이미지첨부");
 					fd = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
 					fd.setVisible(true);
-					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "210", "IMG");
-					obcm.room_id = room_id;
-					obcm.img = new ImageIcon(fd.getDirectory() + fd.getFile());
-					obcm.profile = mainView.getProfile();
-					mainView.sendObject(obcm);
+					ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
+					cm.room_id = room_id;
+					cm.img = new ImageIcon(fd.getDirectory() + fd.getFile());
+					cm.profile = mainView.getProfile();
+					
+					String format = "aa hh:mm";
+					Calendar today = Calendar.getInstance();
+					SimpleDateFormat type = new SimpleDateFormat(format);
+					cm.time = type.format(today.getTime());
+					
+					mainView.sendObject(cm);
 				}
 			}
 		}
