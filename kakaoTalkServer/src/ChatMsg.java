@@ -1,4 +1,5 @@
 
+
 // ChatMsg.java 채팅 메시지 ObjectStream 용.
 import java.io.Serializable;
 import javax.swing.ImageIcon;
@@ -12,6 +13,7 @@ class ChatMsg implements Serializable {
 	public ImageIcon profile;
 	public String userlist;	
 	public String room_id;
+	public String time;
 
 	public ChatMsg(String id, String code, String msg) {
 		this.id = id;
@@ -22,6 +24,7 @@ class ChatMsg implements Serializable {
 	public String getCode() {
 		return code;
 	}
+	
 	public String getData() {
 		return data;
 	}
@@ -37,16 +40,9 @@ class ChatMsg implements Serializable {
 	public void setData(String data) {
 		this.data = data;
 	}
-
-	public void setImg(ImageIcon img) {
-		this.img = img;
-	}
-
-	public void setProfile(ImageIcon profile) {
-		this.profile = profile;
-	}
 	
-	public void setRoomId(String room_id) {
-		this.room_id = room_id;
+	public void setCode(String code) {
+		this.code = code;
 	}
+
 }

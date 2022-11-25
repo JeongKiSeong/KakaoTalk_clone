@@ -13,6 +13,7 @@ class ChatMsg implements Serializable {
 	public ImageIcon profile;
 	public String userlist;	
 	public String room_id;
+	public String time;
 
 	public ChatMsg(String id, String code, String msg) {
 		this.id = id;
@@ -39,16 +40,9 @@ class ChatMsg implements Serializable {
 	public void setData(String data) {
 		this.data = data;
 	}
+	
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-	public void setImg(ImageIcon img) {
-		this.img = img;
-	}
-	
-	public void setProfile(ImageIcon profile) {
-		this.profile = profile;
-	}
-	
-	public void setRoomId(String room_id) {
-		this.room_id = room_id;
-	}
 }
