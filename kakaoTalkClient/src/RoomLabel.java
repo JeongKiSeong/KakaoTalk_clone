@@ -13,8 +13,18 @@ import javax.swing.JLabel;
 
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
+	private ImageIcon roomImg;
+	private String room_id;
+	private String roomName;
+	private String lastMsg;
+	private ChatView chatView;
 
-	public RoomLabel(ImageIcon img, String bigText, String smallText, Point p, String room_id) {
+	public RoomLabel(MainView mainView, ImageIcon img, String userList, String lastMsg, String id) {
+		this.roomImg = img;
+		this.room_id = id;
+		this.roomName = String.join(", ", userList.split(" "));
+		this.lastMsg = lastMsg;
+		
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -23,16 +33,16 @@ public class RoomLabel extends JLabel {
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		JLabel imgLabel = new JLabel(img);
+		JLabel imgLabel = new JLabel(roomImg);
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
-		JLabel bigTextLabel = new JLabel(bigText);
+		JLabel bigTextLabel = new JLabel(roomName);
 		this.add(bigTextLabel);
 		bigTextLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 		bigTextLabel.setBounds(80, 10, 180, 25);
 		
-		JLabel smallTextLabel = new JLabel(smallText);
+		JLabel smallTextLabel = new JLabel(lastMsg);
 		this.add(smallTextLabel);
 		smallTextLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		smallTextLabel.setBounds(80, 35, 180, 20);
@@ -40,12 +50,13 @@ public class RoomLabel extends JLabel {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
 		    {  
-				JFrame frame = new ChatView(p, room_id, bigText);
-				frame.setLocation(p.x + getWidth() + 100, p.y);
-				
-				// TODO 프로필 변경 패널?
-				// TODO userName.equals(name)일 때 프로필 변경 가능. 
-		    }  
+				// Double Clicked
+				 if(e.getClickCount()==2) {
+					chatView = new ChatView(mainView, room_id, roomName);
+					Point p = mainView.getLocationOnScreen();
+					chatView.setLocation(p.x + getWidth() + 100, p.y);
+				 }
+		    }
 		});
 		
 		// 마우스 over할 때 색 교체
@@ -59,5 +70,13 @@ public class RoomLabel extends JLabel {
 				        setBackground(Color.WHITE);
 				    }
 				});
+	}
+	
+	public String getRoomId() {
+		return room_id;
+	}
+	
+	public ChatView getChatView() {
+		return chatView;
 	}
 }

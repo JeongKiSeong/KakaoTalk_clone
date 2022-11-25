@@ -1,4 +1,3 @@
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -155,8 +154,8 @@ public class FriendLabel extends JLabel {
 		return isSel;
 	}
 	
-	// get userName
-	public String getName() {
+	// get getUserName
+	public String getUserName() {
 		return userName;
 	}
 }
