@@ -67,6 +67,9 @@ public class MainView extends JFrame {
 	public String getUserName() {
 		return userName;
 	}
+	public ImageIcon getProfile() {
+		return profileImg;
+	}
 	
 	
 	public MainView(String username, String ip_addr, String port_no) {
@@ -121,8 +124,8 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
-//						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-//						System.out.println(msg);
+ 						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
+						System.out.println(msg);
 					} else
 						continue;
 					
@@ -138,8 +141,14 @@ public class MainView extends JFrame {
 						}
 						else if (data.equals("### 끝 ###")) {
 							//끝 신호 받으면 전체 그리기
-							for (JLabel label : FriendLabelList)
-								addComponent(friendTextPane, label);
+							for (FriendLabel label : FriendLabelList)
+								// 내 프로필을 상단에
+								if (label.getUserName().equals(userName))
+									addComponent(friendTextPane, label);
+							
+							for (FriendLabel label : FriendLabelList)
+								if (!label.getUserName().equals(userName))
+									addComponent(friendTextPane, label);
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
@@ -157,6 +166,18 @@ public class MainView extends JFrame {
 					// 일반 메시지
 					case "200":
 						// TODO AppendText 함수 만들어서 사용
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								// 내가 보낸 메시지
+								if (cm.getId().equals(userName)) {
+									roomLabel.getChatView().AppendTextRight(cm.getData());
+								}
+								else {
+									roomLabel.getChatView().AppendTextLeft(cm.img, cm.getId(), cm.getData());
+								}
+							}
+						}
+							
 					}
 				} catch (IOException e) {
 					try {
@@ -305,12 +326,11 @@ public class MainView extends JFrame {
 					for (FriendLabel label : FriendLabelList) {
 						if (label.isSelected()) {
 							count++;
-							userList += label.getName() + " ";
+							userList += label.getUserName() + " ";
 						}
 					}
 					if (count != 0) { // 선택한 사람이 있을 때만 채팅방 생성
-						ChatMsg obcm = new ChatMsg(userName, "60", "");
-						obcm.userlist = userList;
+						ChatMsg obcm = new ChatMsg(userName, "60", userList);
 						sendObject(obcm);
 						
 						chatroomBtn.doClick(); // 채팅목록으로 변경

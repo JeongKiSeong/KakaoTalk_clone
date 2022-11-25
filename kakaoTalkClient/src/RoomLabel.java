@@ -13,8 +13,18 @@ import javax.swing.JLabel;
 
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
+	private ImageIcon roomImg;
+	private String room_id;
+	private String roomName;
+	private String lastMsg;
+	private ChatView chatView;
 
-	public RoomLabel(MainView mainView, ImageIcon img, String bigText, String smallText, String room_id) {
+	public RoomLabel(MainView mainView, ImageIcon img, String userList, String lastMsg, String id) {
+		this.roomImg = img;
+		this.room_id = id;
+		this.roomName = String.join(", ", userList.split(" "));
+		this.lastMsg = lastMsg;
+		
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -23,16 +33,16 @@ public class RoomLabel extends JLabel {
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		JLabel imgLabel = new JLabel(img);
+		JLabel imgLabel = new JLabel(roomImg);
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
-		JLabel bigTextLabel = new JLabel(bigText);
+		JLabel bigTextLabel = new JLabel(roomName);
 		this.add(bigTextLabel);
 		bigTextLabel.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
 		bigTextLabel.setBounds(80, 10, 180, 25);
 		
-		JLabel smallTextLabel = new JLabel(smallText);
+		JLabel smallTextLabel = new JLabel(lastMsg);
 		this.add(smallTextLabel);
 		smallTextLabel.setFont(new Font("¸¼Àº °íµñ", Font.PLAIN, 14));
 		smallTextLabel.setBounds(80, 35, 180, 20);
@@ -42,9 +52,9 @@ public class RoomLabel extends JLabel {
 		    {  
 				// Double Clicked
 				 if(e.getClickCount()==2) {
-					JFrame frame = new ChatView(mainView, room_id, bigText);
+					chatView = new ChatView(mainView, room_id, roomName);
 					Point p = mainView.getLocationOnScreen();
-					frame.setLocation(p.x + getWidth() + 100, p.y);
+					chatView.setLocation(p.x + getWidth() + 100, p.y);
 				 }
 		    }
 		});
@@ -60,5 +70,13 @@ public class RoomLabel extends JLabel {
 				        setBackground(Color.WHITE);
 				    }
 				});
+	}
+	
+	public String getRoomId() {
+		return room_id;
+	}
+	
+	public ChatView getChatView() {
+		return chatView;
 	}
 }

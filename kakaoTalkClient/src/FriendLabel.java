@@ -154,8 +154,8 @@ public class FriendLabel extends JLabel {
 		return isSel;
 	}
 	
-	// get userName
-	public String getName() {
+	// get getUserName
+	public String getUserName() {
 		return userName;
 	}
 }

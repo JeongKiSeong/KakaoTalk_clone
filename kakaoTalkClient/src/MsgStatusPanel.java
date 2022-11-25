@@ -21,19 +21,19 @@ import javax.swing.JLabel;
 public class MsgStatusPanel extends JPanel {
 	private ImageIcon profile_default = new ImageIcon("./img/profile_default.png");
 
-	public MsgStatusPanel() {
+	public MsgStatusPanel(ImageIcon profile, String name) {
 		setLayout(null);
 		setBackground(new Color(186, 206, 224));
 		setBounds(0, 0, 170, 60);
 		this.setPreferredSize(new Dimension(170, 60));
 		
-		JButton profileButton = new JButton(profile_default);
+		JButton profileButton = new JButton(profile);
 		add(profileButton);
 		profileButton.setBounds(0, 10, 40, 40);
 		profileButton.setBorderPainted(false);
 		profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
-		JLabel nameLabel = new JLabel("NameLabel");
+		JLabel nameLabel = new JLabel(name);
 		add(nameLabel);
 		nameLabel.setBounds(48, 5, 93, 22);
 		nameLabel.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 12));

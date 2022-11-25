@@ -102,22 +102,20 @@ public class ChatView extends JFrame {
 		chatInfoPanel.setBackground(Color.WHITE);
 		chatInfoPanel.setBounds(0, 0, 374, 43);
 		
-		
-		// TODO 테스트용 : 나중에 지울 것
-		AppendTextLeft("왼쪽 테스트 메시지");
-		AppendTextRight("오른쪽 테스트 메시지");
 	}
 	
-	public void AppendTextLeft(String text) {
+	public void AppendTextLeft(ImageIcon profile, String name, String text) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel());
+		textPane.insertComponent(new MsgStatusPanel(profile, name));
 		addComponent(textPane, null);
 		addComponent(textPane, new MsgLabel(text, "L"));
+		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
 	public void AppendTextRight(String text) {
 		SetRightAlign();
 		addComponent(textPane, new MsgLabel(text, "R"));
+		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
 	// keyboard enter key 치면 서버로 전송
@@ -128,15 +126,15 @@ public class ChatView extends JFrame {
 			if (e.getSource() == sendBtn || e.getSource() == textField) {
 				String msg = null;
 				msg = textField.getText();
+				if (msg.equals(""))
+					return;
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "200", msg);
 				cm.room_id = room_id;
+				cm.img = mainView.getProfile();
 				mainView.sendObject(cm);
 				
-				System.out.println(msg);
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
-				if (msg.contains("/exit")) // 종료 처리
-					System.exit(0);
 			}
 		}
 	}
