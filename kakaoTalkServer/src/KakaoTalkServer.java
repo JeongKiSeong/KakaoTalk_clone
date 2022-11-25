@@ -272,19 +272,11 @@ public class KakaoTalkServer extends JFrame {
 						
 						
 					case "200": // 일반 메시지
-						for (int i = 0; i < RoomVec.size(); i++) {
-							RoomData room = RoomVec.elementAt(i);
-							if (cm.room_id.equals(room.getRoom_id())) {
-								for (String userName : room.getUserlist()) {
-									for (int j = 0; j < user_vc.size(); j++) {
-										UserService user = user_vc.elementAt(j);
-										if (user.UserName.equals(userName)) { 
-											user.WriteOneObject(cm);
-										}
-									} 
-								}
-							}
-						}
+						sendToRoomUser(cm);
+						break;
+						
+					case "210":
+						sendToRoomUser(cm);
 						break;
 					}
 				} catch (IOException e) {
@@ -301,6 +293,23 @@ public class KakaoTalkServer extends JFrame {
 				} // 바깥 catch문끝
 			} // while
 		} // run
+		
+		public void sendToRoomUser(ChatMsg cm) {
+			for (int i = 0; i < RoomVec.size(); i++) {
+				RoomData room = RoomVec.elementAt(i);
+				if (cm.room_id.equals(room.getRoom_id())) {
+					for (String userName : room.getUserlist()) {
+						for (int j = 0; j < user_vc.size(); j++) {
+							UserService user = user_vc.elementAt(j);
+							if (user.UserName.equals(userName)) { 
+								user.WriteOneObject(cm);
+							}
+						} 
+					}
+				}
+			}
+		}
+		
 	}
 
 }
