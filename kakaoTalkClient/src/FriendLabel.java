@@ -20,9 +20,13 @@ public class FriendLabel extends JLabel {
 	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
 	private JCheckBox checkbox;
 	private String userName; 
+	private ImageIcon profile; 
+	private String status;
 	
 	public FriendLabel(ImageIcon img, String bigText, String smallText) {
+		this.profile = img;
 		this.userName = bigText;
+		this.status = smallText;
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -157,5 +161,11 @@ public class FriendLabel extends JLabel {
 	// get getUserName
 	public String getUserName() {
 		return userName;
+	}
+	public ImageIcon getProfile() {
+		return profile;
+	}
+	public String getStatus() {
+		return status;
 	}
 }

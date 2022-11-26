@@ -55,6 +55,7 @@ public class MainView extends JFrame {
 	
 	private List<FriendLabel> FriendLabelList = new ArrayList<FriendLabel>();
 	private List<RoomLabel> RoomLabelList = new ArrayList<RoomLabel>();
+	private List<FriendLabel> DialogFriendLabelList = new ArrayList<FriendLabel>();
 	
 	private JTextPane friendTextPane;
 	private JTextPane roomTextPane;
@@ -158,13 +159,36 @@ public class MainView extends JFrame {
 						}
 						break;
 					
+						
+					case "50":
+						ChatView chatView = null;
+						FriendDialog fd = null;
+						for (RoomLabel room : RoomLabelList) {
+							if (room.getRoomId().equals(cm.room_id)) {
+								chatView = room.getChatView();
+							}
+						}
+						fd = chatView.getDialog();
+						
+						for (FriendLabel label : FriendLabelList) {
+							// FriendLabel 복사
+							if (!label.getUserName().equals(userName)) {
+								FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
+								DialogFriendLabelList.add(drl);
+								fd.addComponent(drl);
+							}
+						}
+
+						break;
+
+						
 					case "60": // 채팅방 번호로 채팅방 레이블 생성
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
-						RoomLabel rl = new RoomLabel(mainView, profile_default, cm.userlist, "방 번호 : " + cm.room_id, cm.room_id);
+						ChatView cv= new ChatView(mainView, cm.room_id, cm.getData());
+						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, cm.getData(), "방 번호 : " + cm.room_id, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;
-						
 						
 					// 일반 메시지
 					case "200":
@@ -353,7 +377,9 @@ public class MainView extends JFrame {
 						}
 					}
 					if (count != 0) { // 선택한 사람이 있을 때만 채팅방 생성
-						ChatMsg obcm = new ChatMsg(userName, "60", userList);
+						String roomName = String.join(", ", userList.split(" "));
+						ChatMsg obcm = new ChatMsg(userName, "60", roomName);
+						obcm.userlist = userList;
 						sendObject(obcm);
 						
 						chatroomBtn.doClick(); // 채팅목록으로 변경
@@ -447,5 +473,9 @@ public class MainView extends JFrame {
 			roomTextPane.setSelectionEnd(0);
 		}
 
+	}
+	
+	public List<FriendLabel> getFriendLabelList() {
+		return DialogFriendLabelList;
 	}
 }

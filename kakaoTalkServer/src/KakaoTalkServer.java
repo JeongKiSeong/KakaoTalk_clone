@@ -258,47 +258,59 @@ public class KakaoTalkServer extends JFrame {
 						break;
 						
 						
-					case "10": // 채팅방 입장 신호 -> 채팅메시지 로딩
-						UserService us = null;
-						Calendar enterTime = null;
-						// 입장한 사람 검색
-						for (int i = 0; i < user_vc.size(); i++) {
-							UserService user = user_vc.elementAt(i);
-							if (user.UserName.equals(cm.getId())) { 
-								us = user;
-								break;
-							}
-						}
+//					case "10": // 채팅방 입장 신호 -> 채팅메시지 로딩
+//						UserService us = null;
+//						Calendar enterTime = null;
+//						// 입장한 사람 검색
+//						for (int i = 0; i < user_vc.size(); i++) {
+//							UserService user = user_vc.elementAt(i);
+//							if (user.UserName.equals(cm.getId())) { 
+//								us = user;
+//								break;
+//							}
+//						}
+//						
+//						// 입장 이전에 보냈던 ChatMsg는 제외해야 함
+//						for (int i = 0; i < RoomVec.size(); i++) {
+//							RoomData room = RoomVec.elementAt(i);
+//							if (cm.room_id.equals(room.getRoom_id())) { 
+//								enterTime = room.getEnterTime(cm.getId());
+//								break;
+//							}
+//						}
+//						
+//						// 입장한 사람에게 저장했던 ChatMsg 전송
+//						for (int i = 0; i < ChatVec.size(); i++) {
+//							ChatMsg chatMsg = ChatVec.elementAt(i);
+//							if (cm.room_id.equals(chatMsg.room_id))
+//								if (enterTime.before(cm.time)) {
+//									us.WriteOneObject(chatMsg);
+//								}
+//						}
+//						break;
+//						
 						
-						// 입장 이전에 보냈던 ChatMsg는 제외해야 함
+					case "50": // 방 참여자 목록 요청
 						for (int i = 0; i < RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
 							if (cm.room_id.equals(room.getRoom_id())) { 
-								enterTime = room.getEnterTime(cm.getId());
+								cm.userlist = String.join(" ", room.getUserlist());
 								break;
 							}
 						}
-						
-						// 입장한 사람에게 저장했던 ChatMsg 전송
-						for (int i = 0; i < ChatVec.size(); i++) {
-							ChatMsg chatMsg = ChatVec.elementAt(i);
-							if (cm.room_id.equals(chatMsg.room_id))
-								if (enterTime.before(cm.time)) {
-									us.WriteOneObject(chatMsg);
-								}
-						}
+						this.WriteOneObject(cm);
 						break;
 						
 						
 					case "60": // 채팅방 생성 요청
-						String userList[] = cm.getData().split(" ");
+						String userList[] = cm.userlist.split(" ");
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
 							for (int i = 0; i < user_vc.size(); i++) {
 								UserService user = user_vc.elementAt(i);
 								if (user.UserName.equals(userName)) { 
-									ChatMsg ob = new ChatMsg("SERVER","60", "Making Room");
-									ob.userlist = cm.getData();
+									ChatMsg ob = new ChatMsg("SERVER","60", cm.getData());
+									ob.userlist = cm.userlist;
 									ob.room_id = Integer.toString(roomNum);
 									user.WriteOneObject(ob);
 								}
@@ -310,10 +322,11 @@ public class KakaoTalkServer extends JFrame {
 						
 						
 					case "90": // 채팅방에 친구 초대
+						RoomData r = null;
+						String[] data = cm.userlist.split(" ");
 						for (int i=0; i<RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
 							if (cm.room_id.equals(room.getRoom_id())) {
-								String[] data = cm.getData().split(" ");
 								ArrayList<String> newUserlist = new ArrayList<>();
 								newUserlist.addAll(room.getUserlist());
 								newUserlist.addAll(Arrays.asList(data));
@@ -321,7 +334,22 @@ public class KakaoTalkServer extends JFrame {
 								
 								// 입장 시간 저장
 								room.setEnterTime(cm.getData(), cm.time);
+								r = room;
+								break;
 							}
+						}
+						
+						// uservc 돌면서 초대된 사람들한테 "60" . userlist랑 room_id 담아서
+						for (int i=0; i<data.length; i++) {
+							for (int j = 0; j < user_vc.size(); j++) {
+								UserService user = user_vc.elementAt(j);
+								if (user.UserName.equals(data[i])) { 
+									ChatMsg cm90 = new ChatMsg("SERVER", "60", cm.getData());
+									cm90.userlist = String.join(" ", r.getUserlist());
+									cm90.room_id = r.getRoom_id();
+									user.WriteOneObject(cm90);
+								}
+							} 
 						}
 						break;
 						
