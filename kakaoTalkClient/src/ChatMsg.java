@@ -2,6 +2,8 @@
 
 // ChatMsg.java 채팅 메시지 ObjectStream 용.
 import java.io.Serializable;
+import java.util.Calendar;
+
 import javax.swing.ImageIcon;
 
 class ChatMsg implements Serializable {
@@ -13,12 +15,15 @@ class ChatMsg implements Serializable {
 	public ImageIcon profile;
 	public String userlist;	
 	public String room_id;
-	public String time;
+	public Calendar time;
 
 	public ChatMsg(String id, String code, String msg) {
 		this.id = id;
 		this.code = code;
 		this.data = msg;
+		
+		Calendar today = Calendar.getInstance();
+		this.time = today;
 	}
 
 	public String getCode() {

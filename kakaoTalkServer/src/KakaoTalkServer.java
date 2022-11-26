@@ -24,6 +24,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
@@ -253,8 +257,11 @@ public class KakaoTalkServer extends JFrame {
 						ReloadProfile();
 						break;
 						
+						
 					case "10": // 채팅방 입장 신호 -> 채팅메시지 로딩
 						UserService us = null;
+						Calendar enterTime = null;
+						// 입장한 사람 검색
 						for (int i = 0; i < user_vc.size(); i++) {
 							UserService user = user_vc.elementAt(i);
 							if (user.UserName.equals(cm.getId())) { 
@@ -262,12 +269,26 @@ public class KakaoTalkServer extends JFrame {
 								break;
 							}
 						}
+						
+						// 입장 이전에 보냈던 ChatMsg는 제외해야 함
+						for (int i = 0; i < RoomVec.size(); i++) {
+							RoomData room = RoomVec.elementAt(i);
+							if (cm.room_id.equals(room.getRoom_id())) { 
+								enterTime = room.getEnterTime(cm.getId());
+								break;
+							}
+						}
+						
+						// 입장한 사람에게 저장했던 ChatMsg 전송
 						for (int i = 0; i < ChatVec.size(); i++) {
 							ChatMsg chatMsg = ChatVec.elementAt(i);
 							if (cm.room_id.equals(chatMsg.room_id))
-								us.WriteOneObject(chatMsg);
+								if (enterTime.before(cm.time)) {
+									us.WriteOneObject(chatMsg);
+								}
 						}
 						break;
+						
 						
 					case "60": // 채팅방 생성 요청
 						String userList[] = cm.getData().split(" ");
@@ -283,8 +304,25 @@ public class KakaoTalkServer extends JFrame {
 								}
 							}
 						}
-						RoomVec.add(new RoomData(Integer.toString(roomNum), userList));
+						RoomVec.add(new RoomData(Integer.toString(roomNum), userList, cm.time));
 						roomNum++;
+						break;
+						
+						
+					case "90": // 채팅방에 친구 초대
+						for (int i=0; i<RoomVec.size(); i++) {
+							RoomData room = RoomVec.elementAt(i);
+							if (cm.room_id.equals(room.getRoom_id())) {
+								String[] data = cm.getData().split(" ");
+								ArrayList<String> newUserlist = new ArrayList<>();
+								newUserlist.addAll(room.getUserlist());
+								newUserlist.addAll(Arrays.asList(data));
+								room.setUserlist(newUserlist);
+								
+								// 입장 시간 저장
+								room.setEnterTime(cm.getData(), cm.time);
+							}
+						}
 						break;
 						
 						
@@ -292,6 +330,7 @@ public class KakaoTalkServer extends JFrame {
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
+						
 						
 					case "210": // 사진
 						ChatVec.add(cm);

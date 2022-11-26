@@ -192,7 +192,6 @@ public class ChatView extends JFrame {
 		    {  
 				JFrame f = new JFrame(); //creates jframe f
 				f.setResizable(false);
-		        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //this is your screen size
 		        ImageIcon image = icon; //imports the image
 		        JLabel lbl = new JLabel(image); //puts the image into a jlabel
 		        f.getContentPane().add(lbl); //puts label inside the jframe
@@ -220,11 +219,6 @@ public class ChatView extends JFrame {
 				cm.room_id = room_id;
 				cm.profile = mainView.getProfile();
 				
-				String format = "aa hh:mm";
-				Calendar today = Calendar.getInstance();
-				SimpleDateFormat type = new SimpleDateFormat(format);
-				cm.time = type.format(today.getTime());
-				
 				mainView.sendObject(cm);				
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
@@ -245,11 +239,6 @@ public class ChatView extends JFrame {
 					cm.room_id = room_id;
 					cm.img = new ImageIcon(fd.getDirectory() + fd.getFile());
 					cm.profile = mainView.getProfile();
-					
-					String format = "aa hh:mm";
-					Calendar today = Calendar.getInstance();
-					SimpleDateFormat type = new SimpleDateFormat(format);
-					cm.time = type.format(today.getTime());
 					
 					mainView.sendObject(cm);
 				}

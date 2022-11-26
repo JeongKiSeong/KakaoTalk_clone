@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -163,16 +165,20 @@ public class MainView extends JFrame {
 						addComponent(roomTextPane, rl);
 						break;
 						
+						
 					// 일반 메시지
 					case "200":
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								String format = "aa hh:mm";
+								SimpleDateFormat type = new SimpleDateFormat(format);
+								String time = type.format(cm.time.getTime());
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendTextRight(cm.getData(), cm.time);
+									roomLabel.getChatView().AppendTextRight(cm.getData(), time);
 								}
 								else {
-									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), cm.time);
+									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), time);
 								}
 							}
 						}
@@ -182,12 +188,15 @@ public class MainView extends JFrame {
 					case "210":
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								String format = "aa hh:mm";
+								SimpleDateFormat type = new SimpleDateFormat(format);
+								String time = type.format(cm.time.getTime());
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendImageRight(cm.img, cm.time);
+									roomLabel.getChatView().AppendImageRight(cm.img, time);
 								}
 								else {
-									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img, cm.time);
+									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img, time);
 								}
 							}
 						}
