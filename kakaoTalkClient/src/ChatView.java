@@ -212,11 +212,9 @@ public class ChatView extends JFrame {
 			if (e.getSource() == sendBtn || e.getSource() == textField) {
 				String msg = null;
 				msg = textField.getText();
-<<<<<<< HEAD
 				//SendMessage(msg);
 				
 				System.out.println(msg);
-=======
 				if (msg.equals(""))
 					return;
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "200", msg);
@@ -224,7 +222,6 @@ public class ChatView extends JFrame {
 				cm.profile = mainView.getProfile();
 				mainView.sendObject(cm);
 				
->>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
 			}

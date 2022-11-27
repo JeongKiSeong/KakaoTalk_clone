@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,8 +14,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
-=======
->>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
