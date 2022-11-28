@@ -41,7 +41,8 @@ public class KakaoTalkServer extends JFrame {
 
 	private ServerSocket socket; // 서버소켓
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
-	private Vector<UserService> UserVec = new Vector<UserService>(); // 연결된 사용자를 저장할 벡터
+	private Vector<UserService> UserVec = new Vector<UserService>(); // 로그인한 사람 저장할 벡터
+	private Vector<UserService> LogoutVec = new Vector<UserService>(); // 로그아웃한 사람 저장 벡터
 	private Vector<RoomData> RoomVec = new Vector<RoomData>();
 	private Vector<ChatMsg> ChatVec = new Vector<ChatMsg>();
 	private int roomNum = 0; // 방 번호 배정용
@@ -157,7 +158,6 @@ public class KakaoTalkServer extends JFrame {
 		private ObjectOutputStream oos;
 
 		private Socket client_socket;
-		private Vector<UserService> user_vc;
 		public String UserName = "";
 		public String UserStatus;
 		public ImageIcon ProfileImg;
@@ -166,7 +166,6 @@ public class KakaoTalkServer extends JFrame {
 			// TODO Auto-generated constructor stub
 			// 매개변수로 넘어온 자료 저장
 			this.client_socket = client_socket;
-			this.user_vc = UserVec;
 			try {
 				oos = new ObjectOutputStream(client_socket.getOutputStream());
 				oos.flush();
@@ -177,14 +176,15 @@ public class KakaoTalkServer extends JFrame {
 		}
 
 		public void Logout() {
+			LogoutVec.add(this); // 로그아웃 벡터에 저장
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
 			ReloadProfile();
 		}
 
 		// 모든 User들에게 Object를 방송. 채팅 message와 image object를 보낼 수 있다
 		public void WriteAllObject(Object ob) {
-			for (int i = 0; i < user_vc.size(); i++) {
-				UserService user = user_vc.elementAt(i);
+			for (int i = 0; i < UserVec.size(); i++) {
+				UserService user = UserVec.elementAt(i);
 				user.WriteOneObject(ob);
 			}
 		}
@@ -213,8 +213,8 @@ public class KakaoTalkServer extends JFrame {
 		
 		public void ReloadProfile() {
 			WriteAllObject(new ChatMsg("SERVER", "0", "### 시작 ###"));
-			for (int i = 0; i < user_vc.size(); i++) {
-				UserService user = user_vc.elementAt(i);
+			for (int i = 0; i < UserVec.size(); i++) {
+				UserService user = UserVec.elementAt(i);
 				AppendText("프로필 전송 중 : " + user.UserName);
 				String message = user.UserName + '|' + user.UserStatus;
 				ChatMsg send = new ChatMsg("SERVER", "0", message);
@@ -248,52 +248,74 @@ public class KakaoTalkServer extends JFrame {
 						continue;
 					switch(cm.getCode()) {
 					case "0": // 접속 알림
-						// 접속한 유저 정보를 저장
-						this.UserName = cm.getId();
-						this.UserStatus = cm.getData();
-						this.ProfileImg = cm.img;
+						boolean found = false;
+						// uservec을 돌면서 접속한 기록이 있는지 확인
+						for (int i = 0; i < LogoutVec.size(); i++) {
+							UserService user = LogoutVec.elementAt(i);
+							if (user.UserName.equals(cm.getId())) { 
+								this.UserName = user.UserName;
+								this.UserStatus = user.UserStatus;
+								this.ProfileImg = user.ProfileImg;
+								found = true;
+								LogoutVec.remove(this); // 로그아웃 벡터에서 제거
+								
+								//System.out.println("이미 존재하던 사용자");
+								break;
+							}
+						}
 						
-						// 새 유저가 접속하면 다른 유저에게 프로필 목록을 전송
+						if (!found) { // 새로 접속한 유저
+							// 접속한 유저 정보를 저장
+							this.UserName = cm.getId();
+							this.UserStatus = cm.getData();
+							this.ProfileImg = cm.img;
+							//System.out.println("새로운 사용자");
+						}
+						
+						
 						ReloadProfile();
+						
+						
+						// 기존 유저라면 채팅방 목록, 채팅 메시지 로딩
+						// RoomVec 돌면서 userlist에 this.Uesrname있으면
+						// 60으로 방 정보 전송하고
+						// 방마다 입장 시간 불러와서 -> for문을 여러 개 돌아야 하나?
+						// ChatVec 돌면서 입장 시간 이후 Msg를 유저에게 전송
+						
+						if (found) {
+							// 방 정보 전송
+							for (int i = 0; i < RoomVec.size(); i++) {
+								RoomData room = RoomVec.elementAt(i);
+								if (room.getUserlist().contains(this.UserName)) { // 방에 유저가 있으면
+									ChatMsg ob = new ChatMsg("SERVER","60", room.room_name);
+									ob.userlist = String.join(" ", room.getUserlist());
+									ob.room_id = room.getRoomId();
+									this.WriteOneObject(ob);
+									
+									// 채팅 전송
+									Calendar enterTime = room.getEnterTime(this.UserName);
+									for (int j = 0; j < ChatVec.size(); j++) {
+										ChatMsg chatMsg = ChatVec.elementAt(j);
+										if (room.getRoomId().equals(chatMsg.room_id))
+											// 입장 시간 이후 채팅만 전송
+											if (enterTime.before(cm.time)) {
+												this.WriteOneObject(chatMsg);
+											}
+									}
+								}
+							}
+						}
+						
+						// 방마다 입장 시간을 가져와야하는데.. 
+						
 						break;
-						
-						
-//					case "10": // 채팅방 입장 신호 -> 채팅메시지 로딩
-//						UserService us = null;
-//						Calendar enterTime = null;
-//						// 입장한 사람 검색
-//						for (int i = 0; i < user_vc.size(); i++) {
-//							UserService user = user_vc.elementAt(i);
-//							if (user.UserName.equals(cm.getId())) { 
-//								us = user;
-//								break;
-//							}
-//						}
-//						
-//						// 입장 이전에 보냈던 ChatMsg는 제외해야 함
-//						for (int i = 0; i < RoomVec.size(); i++) {
-//							RoomData room = RoomVec.elementAt(i);
-//							if (cm.room_id.equals(room.getRoom_id())) { 
-//								enterTime = room.getEnterTime(cm.getId());
-//								break;
-//							}
-//						}
-//						
-//						// 입장한 사람에게 저장했던 ChatMsg 전송
-//						for (int i = 0; i < ChatVec.size(); i++) {
-//							ChatMsg chatMsg = ChatVec.elementAt(i);
-//							if (cm.room_id.equals(chatMsg.room_id))
-//								if (enterTime.before(cm.time)) {
-//									us.WriteOneObject(chatMsg);
-//								}
-//						}
-//						break;
-//						
+
+
 						
 					case "50": // 방 참여자 목록 요청
 						for (int i = 0; i < RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
-							if (cm.room_id.equals(room.getRoom_id())) { 
+							if (cm.room_id.equals(room.getRoomId())) { 
 								cm.userlist = String.join(" ", room.getUserlist());
 								break;
 							}
@@ -304,19 +326,20 @@ public class KakaoTalkServer extends JFrame {
 						
 					case "60": // 채팅방 생성 요청
 						String userList[] = cm.userlist.split(" ");
+						String roomName = cm.getData();
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
-							for (int i = 0; i < user_vc.size(); i++) {
-								UserService user = user_vc.elementAt(i);
+							for (int i = 0; i < UserVec.size(); i++) {
+								UserService user = UserVec.elementAt(i);
 								if (user.UserName.equals(userName)) { 
-									ChatMsg ob = new ChatMsg("SERVER","60", cm.getData());
+									ChatMsg ob = new ChatMsg("SERVER","60", roomName);
 									ob.userlist = cm.userlist;
 									ob.room_id = Integer.toString(roomNum);
 									user.WriteOneObject(ob);
 								}
 							}
 						}
-						RoomVec.add(new RoomData(Integer.toString(roomNum), userList, cm.time));
+						RoomVec.add(new RoomData(Integer.toString(roomNum), roomName, userList, cm.time));
 						roomNum++;
 						break;
 						
@@ -326,7 +349,7 @@ public class KakaoTalkServer extends JFrame {
 						String[] data = cm.userlist.split(" ");
 						for (int i=0; i<RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
-							if (cm.room_id.equals(room.getRoom_id())) {
+							if (cm.room_id.equals(room.getRoomId())) {
 								ArrayList<String> newUserlist = new ArrayList<>();
 								newUserlist.addAll(room.getUserlist());
 								newUserlist.addAll(Arrays.asList(data));
@@ -341,12 +364,12 @@ public class KakaoTalkServer extends JFrame {
 						
 						// uservc 돌면서 초대된 사람들한테 "60" . userlist랑 room_id 담아서
 						for (int i=0; i<data.length; i++) {
-							for (int j = 0; j < user_vc.size(); j++) {
-								UserService user = user_vc.elementAt(j);
+							for (int j = 0; j < UserVec.size(); j++) {
+								UserService user = UserVec.elementAt(j);
 								if (user.UserName.equals(data[i])) { 
 									ChatMsg cm90 = new ChatMsg("SERVER", "60", cm.getData());
 									cm90.userlist = String.join(" ", r.getUserlist());
-									cm90.room_id = r.getRoom_id();
+									cm90.room_id = r.getRoomId();
 									user.WriteOneObject(cm90);
 								}
 							} 
@@ -383,10 +406,10 @@ public class KakaoTalkServer extends JFrame {
 		public void sendToRoomUser(ChatMsg cm) {
 			for (int i = 0; i < RoomVec.size(); i++) {
 				RoomData room = RoomVec.elementAt(i);
-				if (cm.room_id.equals(room.getRoom_id())) {
+				if (cm.room_id.equals(room.getRoomId())) {
 					for (String userName : room.getUserlist()) {
-						for (int j = 0; j < user_vc.size(); j++) {
-							UserService user = user_vc.elementAt(j);
+						for (int j = 0; j < UserVec.size(); j++) {
+							UserService user = UserVec.elementAt(j);
 							if (user.UserName.equals(userName)) { 
 								user.WriteOneObject(cm);
 							}

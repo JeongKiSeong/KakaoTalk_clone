@@ -161,9 +161,7 @@ public class ChatView extends JFrame {
 		
 		userlistBtn.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				String userList = "";
-				
+			public void actionPerformed(ActionEvent e) {				
 				friendDialog = new FriendDialog(mainView, chatView);
 				// 서버에 userlist 보내달라고 요청
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "50", "");
@@ -183,7 +181,7 @@ public class ChatView extends JFrame {
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendTextRight(String text, String time) {
+	public void AppendTextRight(String text) {
 		SetRightAlign();
 		addComponent(textPane, new MsgLabel(text, "R"));
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -191,6 +189,7 @@ public class ChatView extends JFrame {
 	
 	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon, String time) {
 		SetLeftAlign();
+		addComponent(textPane, null);
 		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
 		addComponent(textPane, null);
 		AppendImage(ori_icon);
