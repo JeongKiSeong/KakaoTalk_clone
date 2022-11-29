@@ -31,19 +31,28 @@ public class ChatView extends JFrame {
 	private ImageIcon chat_img_clicked = new ImageIcon("./img/chat_img.png");
 	private ImageIcon chat_img = new ImageIcon("./img/chat_img_clicked.png");
 	
+
+	private ImageIcon main_addFriend_clicked = new ImageIcon("./img/main_addFriend.png");
+	private ImageIcon main_addFriend = new ImageIcon("./img/main_addFriend_clicked.png");
+	private ImageIcon chat_userlist = new ImageIcon("./img/chat_userlist.png");
+	private ImageIcon chat_userlist_clicked = new ImageIcon("./img/chat_userlist_clicked.png");
+	
 	private JButton sendBtn;
 	private JButton imgBtn;
 	private JTextPane textPane;
 	private MainView mainView;
 	private String room_id;
 	private Frame frame;
-	private FileDialog fd;
+	private FileDialog fileDialog;
 	private ChatView chatView;
+	private FriendDialog friendDialog;
+	private String room_name;
 	
 	
 	public ChatView(MainView mainView, String room_id, String room_name) {
 		this.mainView = mainView;
 		this.room_id = room_id;
+		this.room_name = room_name;
 		chatView = this;
 		// mainView 오른쪽에 나오도록
 		Point p = mainView.getLocationOnScreen();
@@ -51,11 +60,12 @@ public class ChatView extends JFrame {
 		getContentPane().setLayout(null);
 		setTitle(room_name);
 		setResizable(false);
-		setVisible(true);
+		setVisible(false);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		
 		JScrollPane scrollPane = new JScrollPane();
-		add(scrollPane);
+		getContentPane().add(scrollPane);
 		scrollPane.setBounds(0, 43, 374, 463);
 		scrollPane.setBorder(null);
 
@@ -124,13 +134,48 @@ public class ChatView extends JFrame {
 		JPanel chatInfoPanel = new JPanel();
 		getContentPane().add(chatInfoPanel);
 		chatInfoPanel.setBackground(Color.WHITE);
+		//chatInfoPanel.setBackground(new Color(186, 206, 224));
 		chatInfoPanel.setBounds(0, 0, 374, 43);
+		chatInfoPanel.setLayout(null);
+		
+		// 방 이름 버튼
+		JLabel lblNewLabel = new JLabel(room_name);
+		chatInfoPanel.add(lblNewLabel);
+		lblNewLabel.setBounds(12, 10, 227, 23);
+		lblNewLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+		
+		// 초대 버튼
+		JButton addFriendBtn = new JButton(main_addFriend);
+		chatInfoPanel.add(addFriendBtn);
+		addFriendBtn.setRolloverIcon(main_addFriend_clicked);
+		addFriendBtn.setBounds(280, 0, 41, 41);
+		addFriendBtn.setBorderPainted(false);
+		
+		// 참여자 목록 버튼
+		JButton userlistBtn = new JButton(chat_userlist);
+		chatInfoPanel.add(userlistBtn);
+		userlistBtn.setRolloverIcon(chat_userlist_clicked);
+		userlistBtn.setBorderPainted(false);
+		userlistBtn.setBounds(333, 0, 41, 41);
+		userlistBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		userlistBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {				
+				friendDialog = new FriendDialog(mainView, chatView);
+				// 서버에 userlist 보내달라고 요청
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "50", "");
+				cm.room_id = room_id;
+				mainView.sendObject(cm);
+				
+			}
+		});
 		
 	}
 	
-	public void AppendTextLeft(ImageIcon profile, String name, String text) {
+	public void AppendTextLeft(ImageIcon profile, String name, String text, String time) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel(profile, name));
+		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
 		addComponent(textPane, null);
 		addComponent(textPane, new MsgLabel(text, "L"));
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -142,15 +187,16 @@ public class ChatView extends JFrame {
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon) {
+	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon, String time) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel(profile, name));
+		addComponent(textPane, null);
+		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
 		addComponent(textPane, null);
 		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	
-	public void AppendImageRight(ImageIcon ori_icon) {
+	public void AppendImageRight(ImageIcon ori_icon, String time) {
 		SetRightAlign();
 		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -190,7 +236,6 @@ public class ChatView extends JFrame {
 		    {  
 				JFrame f = new JFrame(); //creates jframe f
 				f.setResizable(false);
-		        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //this is your screen size
 		        ImageIcon image = icon; //imports the image
 		        JLabel lbl = new JLabel(image); //puts the image into a jlabel
 		        f.getContentPane().add(lbl); //puts label inside the jframe
@@ -222,8 +267,11 @@ public class ChatView extends JFrame {
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "200", msg);
 				cm.room_id = room_id;
 				cm.profile = mainView.getProfile();
-				mainView.sendObject(cm);
 				
+<<<<<<< HEAD
+>>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
+=======
+				mainView.sendObject(cm);				
 >>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
 				textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
 				textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
@@ -238,13 +286,14 @@ public class ChatView extends JFrame {
 				// 액션 이벤트가 sendBtn일때 또는 textField 에세 Enter key 치면
 				if (e.getSource() == imgBtn) {
 					frame = new Frame("이미지첨부");
-					fd = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
-					fd.setVisible(true);
-					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "210", "IMG");
-					obcm.room_id = room_id;
-					obcm.img = new ImageIcon(fd.getDirectory() + fd.getFile());
-					obcm.profile = mainView.getProfile();
-					mainView.sendObject(obcm);
+					fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
+					fileDialog.setVisible(true);
+					ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
+					cm.room_id = room_id;
+					cm.img = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
+					cm.profile = mainView.getProfile();
+					
+					mainView.sendObject(cm);
 				}
 			}
 		}
@@ -284,4 +333,15 @@ public class ChatView extends JFrame {
         doc.setParagraphAttributes(doc.getLength(), 1, left, false);
 	}
 	
+	public FriendDialog getDialog() {
+		return friendDialog;
+	}
+	
+	public String getRoomId() {
+		return room_id;
+	}
+	
+	public String getRoomName() {
+		return room_name;
+	}
 }

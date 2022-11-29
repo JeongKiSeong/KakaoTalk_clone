@@ -19,11 +19,12 @@ public class RoomLabel extends JLabel {
 	private String lastMsg;
 	private ChatView chatView;
 
-	public RoomLabel(MainView mainView, ImageIcon img, String userList, String lastMsg, String id) {
+	public RoomLabel(MainView mainView, ChatView cv, ImageIcon img, String roomName, String lastMsg, String id) {
 		this.roomImg = img;
 		this.room_id = id;
-		this.roomName = String.join(", ", userList.split(" "));
+		this.roomName = roomName;
 		this.lastMsg = lastMsg;
+		this.chatView = cv;
 		
 		setOpaque(true);
 		setBackground(Color.WHITE);
@@ -52,24 +53,30 @@ public class RoomLabel extends JLabel {
 		    {  
 				// Double Clicked
 				 if(e.getClickCount()==2) {
-					chatView = new ChatView(mainView, room_id, roomName);
+					cv.setVisible(true);
 					Point p = mainView.getLocationOnScreen();
-					chatView.setLocation(p.x + getWidth() + 100, p.y);
+					cv.setLocation(p.x + getWidth() + 100, p.y);
+					
+//					// 서버에 입장 신호를 줘서 데이터 로딩
+//					String msg = String.format("[%s] %s", mainView.getUserName(), room_id + "번 방에 입장");
+//					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "10", msg);
+//					obcm.room_id = room_id;
+//					mainView.sendObject(obcm);
 				 }
 		    }
 		});
 		
 		// 마우스 over할 때 색 교체
-				this.addMouseListener(new MouseAdapter(){
-				    @Override
-				    public void mouseEntered(MouseEvent e) {
-				        setBackground(new Color(248, 248, 248));
-				    }
-				    @Override
-				    public void mouseExited(MouseEvent e) {
-				        setBackground(Color.WHITE);
-				    }
-				});
+		this.addMouseListener(new MouseAdapter(){
+		    @Override
+		    public void mouseEntered(MouseEvent e) {
+		        setBackground(new Color(248, 248, 248));
+		    }
+		    @Override
+		    public void mouseExited(MouseEvent e) {
+		        setBackground(Color.WHITE);
+		    }
+		});
 	}
 	
 	public String getRoomId() {

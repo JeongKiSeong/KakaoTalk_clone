@@ -15,7 +15,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -53,6 +56,7 @@ public class MainView extends JFrame {
 	
 	private List<FriendLabel> FriendLabelList = new ArrayList<FriendLabel>();
 	private List<RoomLabel> RoomLabelList = new ArrayList<RoomLabel>();
+	private List<FriendLabel> DialogFriendLabelList = new ArrayList<FriendLabel>();
 	
 	private JTextPane friendTextPane;
 	private JTextPane roomTextPane;
@@ -147,12 +151,16 @@ public class MainView extends JFrame {
 							//끝 신호 받으면 전체 그리기
 							for (FriendLabel label : FriendLabelList)
 								// 내 프로필을 상단에
-								if (label.getUserName().equals(userName))
+								if (label.getUserName().equals(userName)) {
 									addComponent(friendTextPane, label);
+									label.checkbox.setSelected(true);
+									label.checkbox.setEnabled(false);
+								}
 							
 							for (FriendLabel label : FriendLabelList)
 								if (!label.getUserName().equals(userName))
 									addComponent(friendTextPane, label);
+							
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
@@ -160,9 +168,36 @@ public class MainView extends JFrame {
 						}
 						break;
 					
+						
+					case "50":
+						List<String> ul =Arrays.asList(cm.userlist.split(" "));
+						DialogFriendLabelList.removeAll(DialogFriendLabelList);
+						ChatView chatView = null;
+						FriendDialog fd = null;
+						for (RoomLabel room : RoomLabelList) {
+							if (room.getRoomId().equals(cm.room_id)) {
+								chatView = room.getChatView();
+							}
+						}
+						fd = chatView.getDialog();
+						
+						for (FriendLabel label : FriendLabelList) {
+							// FriendLabel 복사
+							if (!ul.contains(label.getUserName())) {
+								FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
+								DialogFriendLabelList.add(drl);
+								fd.addComponent(drl);
+							}
+						}
+						
+						break;
+
+						
 					case "60": // 채팅방 번호로 채팅방 레이블 생성
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
-						RoomLabel rl = new RoomLabel(mainView, profile_default, cm.userlist, "방 번호 : " + cm.room_id, cm.room_id);
+						String roomName = cm.getData();
+						ChatView cv= new ChatView(mainView, cm.room_id, roomName);
+						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, "방 번호 : " + cm.room_id, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;
@@ -171,12 +206,15 @@ public class MainView extends JFrame {
 					case "200":
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								String format = "aa hh:mm";
+								SimpleDateFormat type = new SimpleDateFormat(format);
+								String time = type.format(cm.time.getTime());
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
 									roomLabel.getChatView().AppendTextRight(cm.getData());
 								}
 								else {
-									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData());
+									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), time);
 								}
 							}
 						}
@@ -186,12 +224,15 @@ public class MainView extends JFrame {
 					case "210":
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (cm.room_id.equals(roomLabel.getRoomId())) {
+								String format = "aa hh:mm";
+								SimpleDateFormat type = new SimpleDateFormat(format);
+								String time = type.format(cm.time.getTime());
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendImageRight(cm.img);
+									roomLabel.getChatView().AppendImageRight(cm.img, time);
 								}
 								else {
-									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img);
+									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img, time);
 								}
 							}
 						}
@@ -348,7 +389,9 @@ public class MainView extends JFrame {
 						}
 					}
 					if (count != 0) { // 선택한 사람이 있을 때만 채팅방 생성
-						ChatMsg obcm = new ChatMsg(userName, "60", userList);
+						String roomName = String.join(", ", userList.split(" "));
+						ChatMsg obcm = new ChatMsg(userName, "60", roomName);
+						obcm.userlist = userList;
 						sendObject(obcm);
 						
 						chatroomBtn.doClick(); // 채팅목록으로 변경
@@ -442,5 +485,9 @@ public class MainView extends JFrame {
 			roomTextPane.setSelectionEnd(0);
 		}
 
+	}
+	
+	public List<FriendLabel> getFriendLabelList() {
+		return DialogFriendLabelList;
 	}
 }
