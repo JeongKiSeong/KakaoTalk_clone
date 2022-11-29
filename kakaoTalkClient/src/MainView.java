@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -146,12 +147,16 @@ public class MainView extends JFrame {
 							//끝 신호 받으면 전체 그리기
 							for (FriendLabel label : FriendLabelList)
 								// 내 프로필을 상단에
-								if (label.getUserName().equals(userName))
+								if (label.getUserName().equals(userName)) {
 									addComponent(friendTextPane, label);
+									label.checkbox.setSelected(true);
+									label.checkbox.setEnabled(false);
+								}
 							
 							for (FriendLabel label : FriendLabelList)
 								if (!label.getUserName().equals(userName))
 									addComponent(friendTextPane, label);
+							
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
@@ -161,6 +166,8 @@ public class MainView extends JFrame {
 					
 						
 					case "50":
+						List<String> ul =Arrays.asList(cm.userlist.split(" "));
+						DialogFriendLabelList.removeAll(DialogFriendLabelList);
 						ChatView chatView = null;
 						FriendDialog fd = null;
 						for (RoomLabel room : RoomLabelList) {
@@ -172,20 +179,21 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel 복사
-							if (!label.getUserName().equals(userName)) {
+							if (!ul.contains(label.getUserName())) {
 								FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
 								DialogFriendLabelList.add(drl);
 								fd.addComponent(drl);
 							}
 						}
-
+						
 						break;
 
 						
 					case "60": // 채팅방 번호로 채팅방 레이블 생성
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
-						ChatView cv= new ChatView(mainView, cm.room_id, cm.getData());
-						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, cm.getData(), "방 번호 : " + cm.room_id, cm.room_id);
+						String roomName = cm.getData();
+						ChatView cv= new ChatView(mainView, cm.room_id, roomName);
+						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, "방 번호 : " + cm.room_id, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;
@@ -199,7 +207,7 @@ public class MainView extends JFrame {
 								String time = type.format(cm.time.getTime());
 								// 내가 보낸 메시지
 								if (cm.getId().equals(userName)) {
-									roomLabel.getChatView().AppendTextRight(cm.getData(), time);
+									roomLabel.getChatView().AppendTextRight(cm.getData());
 								}
 								else {
 									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), time);

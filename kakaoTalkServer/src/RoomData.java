@@ -12,24 +12,27 @@ public class RoomData implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String room_id;
+	public String room_name;
 	private ArrayList<String> userlist;
 	// 유저별 입장 시간
 	private Hashtable<String, Calendar> enterTime = new Hashtable<String, Calendar>();
 	public ImageIcon roomImg;
 	
-	public RoomData(String room_id, String[] userlist, Calendar time) {
+	public RoomData(String room_id, String room_name, String[] userlist, Calendar time) {
 		this.room_id = room_id;
+		this.room_name = room_name;
 		this.userlist = new ArrayList<>(Arrays.asList(userlist));
 		for (int i=0; i<userlist.length; i++) {
 			this.enterTime.put(userlist[i], time);
 		}
 	}
 	
-	public String getRoom_id() {
+	
+	public String getRoomId() {
 		return room_id;
 	}
 
-	public void setRoom_id(String room_id) {
+	public void setRoomId(String room_id) {
 		this.room_id = room_id;
 	}
 
