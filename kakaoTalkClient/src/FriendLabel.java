@@ -18,7 +18,7 @@ public class FriendLabel extends JLabel {
 	
 	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
 	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
-	private JCheckBox checkbox;
+	public JCheckBox checkbox;
 	private String userName; 
 	private ImageIcon profile; 
 	private String status;

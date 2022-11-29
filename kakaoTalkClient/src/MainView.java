@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -146,12 +147,16 @@ public class MainView extends JFrame {
 							//끝 신호 받으면 전체 그리기
 							for (FriendLabel label : FriendLabelList)
 								// 내 프로필을 상단에
-								if (label.getUserName().equals(userName))
+								if (label.getUserName().equals(userName)) {
 									addComponent(friendTextPane, label);
+									label.checkbox.setSelected(true);
+									label.checkbox.setEnabled(false);
+								}
 							
 							for (FriendLabel label : FriendLabelList)
 								if (!label.getUserName().equals(userName))
 									addComponent(friendTextPane, label);
+							
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
@@ -161,6 +166,7 @@ public class MainView extends JFrame {
 					
 						
 					case "50":
+						List<String> ul =Arrays.asList(cm.userlist.split(" "));
 						DialogFriendLabelList.removeAll(DialogFriendLabelList);
 						ChatView chatView = null;
 						FriendDialog fd = null;
@@ -173,13 +179,13 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel 복사
-							if (!label.getUserName().equals(userName)) {
+							if (!ul.contains(label.getUserName())) {
 								FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
 								DialogFriendLabelList.add(drl);
 								fd.addComponent(drl);
 							}
 						}
-
+						
 						break;
 
 						
