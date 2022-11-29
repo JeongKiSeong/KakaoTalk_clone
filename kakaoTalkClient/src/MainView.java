@@ -128,11 +128,7 @@ public class MainView extends JFrame {
 						break;
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
-<<<<<<< HEAD
-						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-=======
  						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
->>>>>>> branch 'master' of https://github.com/JeongKiSeong/KakaoTalk_clone.git
 						System.out.println(msg);
 					} else
 						continue;
