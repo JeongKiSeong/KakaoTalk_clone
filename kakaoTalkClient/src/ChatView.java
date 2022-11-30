@@ -1,13 +1,11 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -39,10 +37,10 @@ public class ChatView extends JFrame {
 	
 	private JButton sendBtn;
 	private JButton imgBtn;
+	private JButton emoteBtn;
 	private JTextPane textPane;
 	private MainView mainView;
 	private String room_id;
-	private Frame frame;
 	private FileDialog fileDialog;
 	private ChatView chatView;
 	private FriendDialog friendDialog;
@@ -106,12 +104,13 @@ public class ChatView extends JFrame {
 		sendBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		// 이모티콘 버튼
-		JButton emoteBtn = new JButton(chat_emote);
+		emoteBtn = new JButton(chat_emote);
 		chatOptionPanel.add(emoteBtn);
 		emoteBtn.setRolloverIcon(chat_emote_clicked);
 		emoteBtn.setBounds(8, 3, 37, 37);
 		emoteBtn.setBorderPainted(false);
 		emoteBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		emoteBtn.addActionListener(new AnotherSendAction());
 		
 		// 파일 버튼
 		JButton fileBtn = new JButton(chat_file);
@@ -128,7 +127,7 @@ public class ChatView extends JFrame {
 		imgBtn.setBorderPainted(false);
 		imgBtn.setBounds(96, 3, 37, 37);
 		imgBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		imgBtn.addActionListener(new ImageSendAction());
+		imgBtn.addActionListener(new AnotherSendAction());
 			
 		// 채팅창 이름, 채팅창 사진이 있는 패널
 		JPanel chatInfoPanel = new JPanel();
@@ -145,11 +144,11 @@ public class ChatView extends JFrame {
 		lblNewLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 		
 		// 초대 버튼
-		JButton addFriendBtn = new JButton(main_addFriend);
-		chatInfoPanel.add(addFriendBtn);
-		addFriendBtn.setRolloverIcon(main_addFriend_clicked);
-		addFriendBtn.setBounds(280, 0, 41, 41);
-		addFriendBtn.setBorderPainted(false);
+//		JButton addFriendBtn = new JButton(main_addFriend);
+//		chatInfoPanel.add(addFriendBtn);
+//		addFriendBtn.setRolloverIcon(main_addFriend_clicked);
+//		addFriendBtn.setBounds(280, 0, 41, 41);
+//		addFriendBtn.setBorderPainted(false);
 		
 		// 참여자 목록 버튼
 		JButton userlistBtn = new JButton(chat_userlist);
@@ -270,24 +269,29 @@ public class ChatView extends JFrame {
 		}
 	}
 	
-	// 사진 선택 후 전송
-		class ImageSendAction implements ActionListener {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// 액션 이벤트가 sendBtn일때 또는 textField 에세 Enter key 치면
-				if (e.getSource() == imgBtn) {
-					frame = new Frame("이미지첨부");
-					fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
-					fileDialog.setVisible(true);
-					ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
-					cm.room_id = room_id;
-					cm.img = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
-					cm.profile = mainView.getProfile();
-					
-					mainView.sendObject(cm);
-				}
+	// 사진, 파일, 이모티콘 액션 리스너
+	class AnotherSendAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// 사진 버튼
+			if (e.getSource() == imgBtn) {
+				Frame frame = new Frame("이미지첨부");
+				fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
+				fileDialog.setVisible(true);
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
+				cm.room_id = room_id;
+				cm.img = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
+				cm.profile = mainView.getProfile();
+				
+				mainView.sendObject(cm);
+			}
+			
+			// 이모티콘 버튼
+			if (e.getSource() == emoteBtn) {
+				new EmoticonDialog(chatView);
 			}
 		}
+	}
 	
 	// JTextPane에 컴포넌트 추가하는 함수
 	public void addComponent(JTextPane textPane, Component component) {
@@ -335,4 +339,9 @@ public class ChatView extends JFrame {
 	public String getRoomName() {
 		return room_name;
 	}
+	
+	public MainView getMainVeiw() {
+		return mainView;
+	}
+	
 }

@@ -5,11 +5,8 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-
 
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
@@ -56,12 +53,6 @@ public class RoomLabel extends JLabel {
 					cv.setVisible(true);
 					Point p = mainView.getLocationOnScreen();
 					cv.setLocation(p.x + getWidth() + 100, p.y);
-					
-//					// 서버에 입장 신호를 줘서 데이터 로딩
-//					String msg = String.format("[%s] %s", mainView.getUserName(), room_id + "번 방에 입장");
-//					ChatMsg obcm = new ChatMsg(mainView.getUserName(), "10", msg);
-//					obcm.room_id = room_id;
-//					mainView.sendObject(obcm);
 				 }
 		    }
 		});

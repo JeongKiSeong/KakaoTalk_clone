@@ -277,12 +277,7 @@ public class KakaoTalkServer extends JFrame {
 						ReloadProfile();
 						
 						
-						// 기존 유저라면 채팅방 목록, 채팅 메시지 로딩
-						// RoomVec 돌면서 userlist에 this.Uesrname있으면
-						// 60으로 방 정보 전송하고
-						// 방마다 입장 시간 불러와서 -> for문을 여러 개 돌아야 하나?
-						// ChatVec 돌면서 입장 시간 이후 Msg를 유저에게 전송
-						
+						// 기존 유저라면 채팅방 목록, 채팅 메시지 로딩						
 						if (found) {
 							// 방 정보 전송
 							for (int i = 0; i < RoomVec.size(); i++) {
@@ -306,8 +301,6 @@ public class KakaoTalkServer extends JFrame {
 								}
 							}
 						}
-						
-						// 방마다 입장 시간을 가져와야하는데.. 
 						
 						break;
 
