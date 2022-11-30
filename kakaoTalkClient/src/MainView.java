@@ -1,16 +1,12 @@
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,23 +14,19 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -74,7 +66,6 @@ public class MainView extends JFrame {
 	public ImageIcon getProfile() {
 		return profileImg;
 	}
-	
 	
 	public MainView(String username, String ip_addr, String port_no) {
 		mainView = this;
@@ -179,11 +170,13 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel บนป็
-							if (!ul.contains(label.getUserName())) {
-								FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
-								DialogFriendLabelList.add(drl);
-								fd.addComponent(drl);
+							FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
+							if (ul.contains(label.getUserName())) {
+								drl.checkbox.setEnabled(false);
 							}
+							DialogFriendLabelList.add(drl);
+							fd.addComponent(drl);
+						
 						}
 						
 						break;
