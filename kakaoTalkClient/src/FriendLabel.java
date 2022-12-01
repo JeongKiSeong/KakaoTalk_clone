@@ -74,7 +74,7 @@ public class FriendLabel extends JLabel {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
 		    {  
-				JFrame frame = new ProfileFrame(profile, userName, status);
+				JFrame frame = new ProfileFrame();
 				Point location = getLocationOnScreen();
 				frame.setLocation(location.x + getWidth() + 20, location.y);
 		    }  
@@ -102,7 +102,7 @@ public class FriendLabel extends JLabel {
 		
 		imgLabel.setIcon(this.profile);
 		nameLabel.setText(this.userName);
-		nameLabel.setText(this.status);
+		statusLabel.setText(this.status);
 	}
 
 	// ÇÁ·ÎÇÊ ¶ç¿ï ÇÁ·¹ÀÓ
@@ -110,7 +110,7 @@ public class FriendLabel extends JLabel {
 		private static final long serialVersionUID = 1L;
 		private ImageIcon imgicon;
 
-		public ProfileFrame(ImageIcon profile, String name, String status) {
+		public ProfileFrame() {
 			setTitle("ÇÁ·ÎÇÊ");
 			setSize(300, 300);
 			setResizable(false);
@@ -128,24 +128,24 @@ public class FriendLabel extends JLabel {
 			imgLabel.setBounds(114, 36, 61, 56);
 			//imgLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			JLabel nameLabel = new JLabel(name);
+			JLabel nameLabel = new JLabel(userName);
 			panel.add(nameLabel);
 			nameLabel.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
-			nameLabel.setBounds(100, 133, 90, 34);
+			nameLabel.setBounds(100, 110, 90, 34);
 			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 			JLabel statusLabel = new JLabel(status);
 			panel.add(statusLabel);
-			statusLabel.setBounds(58, 177, 172, 29);
+			statusLabel.setBounds(58, 150, 172, 29);
 			statusLabel.setFont(new Font("¸¼Àº °íµñ", Font.PLAIN, 14));
 			statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			if (name.equals(mainView.getUserName())) {
+			if (userName.equals(mainView.getUserName())) {
 				JButton updateprofileBtn=new JButton("ÇÁ·ÎÇÊ º¯°æ");
 				panel.add(updateprofileBtn);
-				updateprofileBtn.setBounds(58, 177, 172, 29);
+				updateprofileBtn.setBounds(58, 200, 172, 29);
 				updateprofileBtn.setFont(new Font("¸¼Àº °íµñ", Font.PLAIN, 14));
 				updateprofileBtn.setHorizontalAlignment(SwingConstants.CENTER);
 				updateprofileBtn.addActionListener(new ActionListener() {
@@ -180,7 +180,7 @@ public class FriendLabel extends JLabel {
 							}
 							
 							imgLabel.setIcon(imgicon);
-							ChatMsg msg=new ChatMsg(userName, "30", mainView.getStatus());
+							ChatMsg msg=new ChatMsg(userName, "30", status);
 							msg.img = imgicon;
 							mainView.sendObject(msg);
 						}
