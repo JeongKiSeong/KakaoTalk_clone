@@ -13,14 +13,13 @@ public class RoomLabel extends JLabel {
 	private ImageIcon roomImg;
 	private String room_id;
 	private String roomName;
-	private String lastMsg;
 	private ChatView chatView;
+	private JLabel smallTextLabel;
 
-	public RoomLabel(MainView mainView, ChatView cv, ImageIcon img, String roomName, String lastMsg, String id) {
+	public RoomLabel(MainView mainView, ChatView cv, ImageIcon img, String roomName, String id) {
 		this.roomImg = img;
 		this.room_id = id;
 		this.roomName = roomName;
-		this.lastMsg = lastMsg;
 		this.chatView = cv;
 		
 		setOpaque(true);
@@ -40,7 +39,7 @@ public class RoomLabel extends JLabel {
 		bigTextLabel.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
 		bigTextLabel.setBounds(80, 10, 180, 25);
 		
-		JLabel smallTextLabel = new JLabel(lastMsg);
+		smallTextLabel = new JLabel("");
 		this.add(smallTextLabel);
 		smallTextLabel.setFont(new Font("¸¼Àº °íµñ", Font.PLAIN, 14));
 		smallTextLabel.setBounds(80, 35, 180, 20);
@@ -76,5 +75,9 @@ public class RoomLabel extends JLabel {
 	
 	public ChatView getChatView() {
 		return chatView;
+	}
+	
+	public void setLastMsg(String lastMsg) {
+		smallTextLabel.setText(lastMsg);
 	}
 }
