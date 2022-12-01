@@ -387,17 +387,20 @@ public class KakaoTalkServer extends JFrame {
 						
 						
 					case "200": // 일반 메시지
+						cm.profile = new ResizedImage(cm.profile, 40).run();
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
 						
 						
 					case "210": // 사진
+						cm.profile = new ResizedImage(cm.profile, 40).run();
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
 						
 					case "220": // 파일
+						cm.profile = new ResizedImage(cm.profile, 40).run();
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
