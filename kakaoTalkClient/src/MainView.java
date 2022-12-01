@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -31,6 +32,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
+import utils.MakeRoundedCorner;
 
 
 // 친구 목록, 채팅 목록 나오는 화면
@@ -65,6 +68,9 @@ public class MainView extends JFrame {
 	}
 	public ImageIcon getProfile() {
 		return profileImg;
+	}
+	public String getStatus() {
+		return userStatus;
 	}
 	
 	public MainView(String username, String ip_addr, String port_no) {
@@ -120,7 +126,7 @@ public class MainView extends JFrame {
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
  						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-						System.out.println(msg);
+						//System.out.println(msg);
 					} else
 						continue;
 					
@@ -151,10 +157,23 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							FriendLabelList.add(new FriendLabel(cm.img, profile[0], profile[1]));
+							ImageIcon round_img = new MakeRoundedCorner(cm.img, 30).run();
+							FriendLabelList.add(new FriendLabel(mainView, round_img, profile[0], profile[1]));
 						}
 						break;
 					
+						
+					case "30": // 프로필, 이름, 상태 변경
+						System.out.println(cm.getId() + "님이 프로필 변경");
+						for (FriendLabel friendlabel : FriendLabelList) {
+							// TODO FrinedLabel에 있는 ImgLable 변경
+							if (friendlabel.getUserName().equals(cm.getId())) {
+								// TODO
+								friendlabel.updateProfile(cm.img, cm.getId(), cm.getData());
+							}
+						}
+						break;
+						
 						
 					case "50":
 						List<String> ul =Arrays.asList(cm.userlist.split(" "));
@@ -170,7 +189,7 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel 복사
-							FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
+							FriendLabel drl = new FriendLabel(mainView, label.getProfile(), label.getUserName(), label.getStatus());
 							if (ul.contains(label.getUserName())) {
 								drl.checkbox.setEnabled(false);
 							}
@@ -225,7 +244,13 @@ public class MainView extends JFrame {
 								}
 							}
 						}
-						break;							
+						break;			
+						
+					case "220": //파일
+						System.out.println("파일명 : " + cm.file.getName());
+						//cm.file.createNewFile();
+							
+						break;
 					}
 				} catch (IOException e) {
 					try {

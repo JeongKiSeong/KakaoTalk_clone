@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -38,10 +39,10 @@ public class ChatView extends JFrame {
 	private JButton sendBtn;
 	private JButton imgBtn;
 	private JButton emoteBtn;
+	private JButton fileBtn;
 	private JTextPane textPane;
 	private MainView mainView;
 	private String room_id;
-	private FileDialog fileDialog;
 	private ChatView chatView;
 	private FriendDialog friendDialog;
 	private String room_name;
@@ -113,12 +114,13 @@ public class ChatView extends JFrame {
 		emoteBtn.addActionListener(new AnotherSendAction());
 		
 		// 파일 버튼
-		JButton fileBtn = new JButton(chat_file);
+		fileBtn = new JButton(chat_file);
 		chatOptionPanel.add(fileBtn);
 		fileBtn.setRolloverIcon(chat_file_clicked);
 		fileBtn.setBorderPainted(false);
 		fileBtn.setBounds(52, 3, 37, 37);
 		fileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		fileBtn.addActionListener(new AnotherSendAction());
 		
 		// 사진 버튼
 		imgBtn = new JButton(chat_img);
@@ -276,7 +278,7 @@ public class ChatView extends JFrame {
 			// 사진 버튼
 			if (e.getSource() == imgBtn) {
 				Frame frame = new Frame("이미지첨부");
-				fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
+				FileDialog fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
 				fileDialog.setVisible(true);
 				ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
 				cm.room_id = room_id;
@@ -287,8 +289,22 @@ public class ChatView extends JFrame {
 			}
 			
 			// 이모티콘 버튼
-			if (e.getSource() == emoteBtn) {
+			else if (e.getSource() == emoteBtn) {
 				new EmoticonDialog(chatView);
+			}
+			
+			else if (e.getSource() == fileBtn) {
+				Frame frame = new Frame("파일 첨부");
+				FileDialog fileDialog = new FileDialog(frame, "파일 선택", FileDialog.LOAD);
+				fileDialog.setVisible(true);
+				
+				// 220 으로 파일 전송
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "220", "File");
+				cm.room_id = chatView.getRoomId();
+				cm.profile = mainView.getProfile();
+				cm.file = new File(fileDialog.getDirectory() + fileDialog.getFile());
+				mainView.sendObject(cm);
+				
 			}
 		}
 	}

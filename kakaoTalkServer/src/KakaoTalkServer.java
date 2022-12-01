@@ -303,7 +303,11 @@ public class KakaoTalkServer extends JFrame {
 						
 						break;
 
-
+						
+					case "30": // 프로필 변경
+						WriteAllObject(cm);
+						break;
+						
 						
 					case "50": // 방 참여자 목록 요청
 						for (int i = 0; i < RoomVec.size(); i++) {
@@ -377,6 +381,11 @@ public class KakaoTalkServer extends JFrame {
 						
 						
 					case "210": // 사진
+						ChatVec.add(cm);
+						sendToRoomUser(cm);
+						break;
+						
+					case "220": // 파일
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
