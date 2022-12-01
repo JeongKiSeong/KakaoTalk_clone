@@ -23,43 +23,44 @@ import utils.MakeRoundedCorner;
 public class FriendLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 	
-	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
-	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
+//	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
+//	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
 	public JCheckBox checkbox;
 	private String userName; 
 	private ImageIcon profile; 
 	private String status;
 	private MainView mainView;
+	private JLabel imgLabel;
+	private JLabel nameLabel;
+	private JLabel statusLabel;
 	
 	public FriendLabel(MainView mainView, ImageIcon img, String bigText, String smallText) {
 		this.profile = img;
 		this.userName = bigText;
 		this.status = smallText;
-		this.mainView=mainView;
+		this.mainView = mainView;
 		setOpaque(true);
 		setBackground(Color.WHITE);
-		//setBorder(BorderFactory.createLineBorder(Color.black));
 		setBounds(0, 0, 280, 80);
 		setPreferredSize(new Dimension(280, 70));
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		// 프로필 둥글게
-		JLabel imgLabel = new JLabel(new MakeRoundedCorner(img, 30).run());
+		imgLabel = new JLabel(profile);
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
-		JLabel bigTextLabel = new JLabel(bigText);
-		this.add(bigTextLabel);
-		bigTextLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-		bigTextLabel.setBounds(80, 10, 180, 25);
+		nameLabel = new JLabel(userName);
+		this.add(nameLabel);
+		nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+		nameLabel.setBounds(80, 10, 180, 25);
 		
-		JLabel smallTextLabel = new JLabel(smallText);
-		this.add(smallTextLabel);
-		smallTextLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-		smallTextLabel.setBounds(80, 35, 180, 20);
+		statusLabel = new JLabel(status);
+		this.add(statusLabel);
+		statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+		statusLabel.setBounds(80, 35, 180, 20);
 		
-		// TODO 온라인 -> 초록불, 오프라인 -> 파란불
+		// 온라인 -> 초록불, 오프라인 -> 파란불
 //		JLabel StatusLabel = new JLabel(status_green);
 //		this.add(StatusLabel);
 //		StatusLabel.setBounds(260, 30, 10, 10);
@@ -73,12 +74,9 @@ public class FriendLabel extends JLabel {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e)  
 		    {  
-				JFrame frame = new ProfileFrame(img, bigText, smallText);
+				JFrame frame = new ProfileFrame(profile, userName, status);
 				Point location = getLocationOnScreen();
 				frame.setLocation(location.x + getWidth() + 20, location.y);
-				
-				// TODO 프로필 변경 패널?
-				// TODO userName.equals(name)일 때 프로필 변경 가능. 
 		    }  
 		});
 		
@@ -95,6 +93,16 @@ public class FriendLabel extends JLabel {
 		        checkbox.setBackground(Color.WHITE);
 		    }
 		});
+	}
+	
+	public void updateProfile(ImageIcon profile, String name, String status) { // 프로필 변경
+		this.profile = profile;
+		this.userName = name;
+		this.status = status;
+		
+		imgLabel.setIcon(this.profile);
+		nameLabel.setText(this.userName);
+		nameLabel.setText(this.status);
 	}
 
 	// 프로필 띄울 프레임
@@ -150,9 +158,30 @@ public class FriendLabel extends JLabel {
 							FileDialog fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
 							fileDialog.setVisible(true);
 							imgicon = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
+							
+							
+							int width = imgicon.getIconWidth();
+							int height = imgicon.getIconHeight();
+							double ratio;
+							Image img = imgicon.getImage();
+							// Image가 너무 크면 최대 가로 또는 세로 200 기준으로 축소시킨다.
+							if (width > 61 || height > 61) {
+								if (width > height) { // 가로 사진
+									ratio = (double) height / width;
+									width = 61;
+									height = (int) (width * ratio);
+								} else { // 세로 사진
+									ratio = (double) width / height;
+									height = 61;
+									width = (int) (height * ratio);
+								}
+								Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+								imgicon = new ImageIcon(new_img);
+							}
+							
 							imgLabel.setIcon(imgicon);
-							ChatMsg msg=new ChatMsg(userName, "30", "프로필 변경됨");
-							msg.profile=imgicon;
+							ChatMsg msg=new ChatMsg(userName, "30", mainView.getStatus());
+							msg.img = imgicon;
 							mainView.sendObject(msg);
 						}
 						
@@ -160,25 +189,24 @@ public class FriendLabel extends JLabel {
 				});
 			}
 			
-			// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
-			// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
 			imgLabel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent  e) {
 					Point location = getLocationOnScreen();
-					new ProfileZoom(profile).setLocation(location.x + getWidth() + 20, location.y);
+					new ProfileZoom().setLocation(location.x + getWidth() + 20, location.y);
 					//frame.setVisible(false);
 				}
 			});
 		}
 			
 		public class ProfileZoom extends JFrame {
-			public ProfileZoom(ImageIcon profile) {
+			public ProfileZoom() {
 				setTitle("프로필");
 				setSize(300, 300);
 				setResizable(false);
 				setVisible(true);
 				
+				//TODO 사진 확대할 때도 비율 유지하도록 변경해야 함
 				Image img = profile.getImage();
 				// 창의 사이즈인 300, 300에 맞춰서 이미지를 변경
 				Image changeImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);

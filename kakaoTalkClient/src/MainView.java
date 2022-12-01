@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -31,6 +32,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
+import utils.MakeRoundedCorner;
 
 
 // 친구 목록, 채팅 목록 나오는 화면
@@ -65,6 +68,9 @@ public class MainView extends JFrame {
 	}
 	public ImageIcon getProfile() {
 		return profileImg;
+	}
+	public String getStatus() {
+		return userStatus;
 	}
 	
 	public MainView(String username, String ip_addr, String port_no) {
@@ -151,15 +157,20 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							FriendLabelList.add(new FriendLabel(mainView, cm.img, profile[0], profile[1]));
+							ImageIcon round_img = new MakeRoundedCorner(cm.img, 30).run();
+							FriendLabelList.add(new FriendLabel(mainView, round_img, profile[0], profile[1]));
 						}
 						break;
 					
 						
-					case "30": // 프로필 변경
+					case "30": // 프로필, 이름, 상태 변경
 						System.out.println(cm.getId() + "님이 프로필 변경");
 						for (FriendLabel friendlabel : FriendLabelList) {
 							// TODO FrinedLabel에 있는 ImgLable 변경
+							if (friendlabel.getUserName().equals(cm.getId())) {
+								// TODO
+								friendlabel.updateProfile(cm.img, cm.getId(), cm.getData());
+							}
 						}
 						break;
 						
