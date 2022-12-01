@@ -63,7 +63,7 @@ public class EmoticonDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// 210으로 사진처럼 보내기
-					ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "Emoticon");
+					ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "이모티콘을 보냈습니다.");
 					cm.img = resizedEmoteicon;
 					cm.room_id = chatView.getRoomId();
 					cm.profile = mainView.getProfile();

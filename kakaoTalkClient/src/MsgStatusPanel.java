@@ -7,9 +7,12 @@ import java.awt.Font;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+
+import utils.ResizedImage;
 
 // 해쉬태그에 친구 목록을 넣어놓고, 친구 이름으로 서치
 // 벡터로 for 돌면서 해도 됨. 꼭 해쉬태그로 할 필요 없음.
@@ -18,6 +21,8 @@ import javax.swing.JLabel;
 
 // 이미지 크기 : (40, 40)
 public class MsgStatusPanel extends JPanel {
+	private JLabel profileLabel;
+	private JLabel nameLabel;
 	
 	public MsgStatusPanel(ImageIcon profile, String name, String time) {
 		setLayout(null);
@@ -25,13 +30,14 @@ public class MsgStatusPanel extends JPanel {
 		setBounds(0, 0, 170, 60);
 		this.setPreferredSize(new Dimension(170, 60));
 		
-		JButton profileButton = new JButton(profile);
-		add(profileButton);
-		profileButton.setBounds(0, 10, 40, 40);
-		profileButton.setBorderPainted(false);
-		profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		profileLabel = new JLabel(profile);
+		add(profileLabel);
+		profileLabel.setBounds(0, 10, 40, 40);
+		profileLabel.setBackground(Color.WHITE);
+		profileLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		profileLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
-		JLabel nameLabel = new JLabel(name);
+		nameLabel = new JLabel(name);
 		add(nameLabel);
 		nameLabel.setBounds(48, 5, 93, 22);
 		nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
@@ -42,6 +48,13 @@ public class MsgStatusPanel extends JPanel {
 		
 		timeLabel.setText(time);
 		timeLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+		
+	}
+	
+	
+	public void replaceImage(String name, ImageIcon img) {
+		if (nameLabel.getText().equals(name))
+			profileLabel.setIcon(new ResizedImage(img, 40).run());
 		
 	}
 }

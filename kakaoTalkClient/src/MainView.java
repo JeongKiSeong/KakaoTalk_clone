@@ -148,6 +148,9 @@ public class MainView extends JFrame {
 									addComponent(friendTextPane, label);
 									label.checkbox.setSelected(true);
 									label.checkbox.setEnabled(false);
+									
+									profileImg = label.getProfile();
+									userStatus = label.getStatus();
 								}
 							
 							for (FriendLabel label : FriendLabelList)
@@ -162,8 +165,9 @@ public class MainView extends JFrame {
 							FriendLabelList.add(new FriendLabel(mainView, cm.img, profile[0], profile[1]));
 						}
 						break;
-					
+
 						
+					
 					case "30": // 프로필, 이름, 상태 변경
 						for (FriendLabel friendlabel : FriendLabelList) {
 							// TODO FrinedLabel에 있는 ImgLable 변경
@@ -172,6 +176,19 @@ public class MainView extends JFrame {
 								friendlabel.updateProfile(cm.img, cm.getId(), cm.getData());
 							}
 						}
+						if (cm.getId().equals(userName)) {
+							profileImg = cm.img;
+							userStatus = cm.getData();
+						}
+						
+						// 채팅방 프로필 변경
+						for (RoomLabel roomLabel : RoomLabelList) {
+							List<MsgStatusPanel> msgStatusPanelList = roomLabel.getChatView().getMsgStatusPanel();
+							for (MsgStatusPanel msgStatusPanel : msgStatusPanelList) {
+								msgStatusPanel.replaceImage(cm.getId(), cm.img);
+							}
+						}
+						
 						break;
 						
 						
@@ -205,7 +222,7 @@ public class MainView extends JFrame {
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
 						String roomName = cm.getData();
 						ChatView cv= new ChatView(mainView, cm.room_id, roomName);
-						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, "방 번호 : " + cm.room_id, cm.room_id);
+						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;
@@ -224,6 +241,7 @@ public class MainView extends JFrame {
 								else {
 									roomLabel.getChatView().AppendTextLeft(cm.profile, cm.getId(), cm.getData(), time);
 								}
+								roomLabel.setLastMsg(cm.getData());
 							}
 						}
 						break;
@@ -242,6 +260,7 @@ public class MainView extends JFrame {
 								else {
 									roomLabel.getChatView().AppendImageLeft(cm.profile, cm.getId(), cm.img, time);
 								}
+								roomLabel.setLastMsg(cm.getData());
 							}
 						}
 						break;			

@@ -6,7 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -305,11 +304,20 @@ public class KakaoTalkServer extends JFrame {
 						
 						break;
 
+				
 						
 					case "30": // 프로필 변경
 						this.ProfileImg = cm.img;
 						this.UserStatus = cm.getData();
-						WriteAllObject(cm);
+						WriteAllObject(cm); 
+						
+						// ChatVec 순환하면서 cm.profile 변경하기
+						String name = cm.getId();
+						for (int j = 0; j < ChatVec.size(); j++) {
+							ChatMsg chatMsg = ChatVec.elementAt(j);
+							if (name.equals(chatMsg.getId()))
+								chatMsg.profile = new ResizedImage(cm.img, 40).run();
+						}
 						break;
 						
 						
