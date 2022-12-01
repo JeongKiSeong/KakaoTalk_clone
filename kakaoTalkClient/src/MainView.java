@@ -151,10 +151,18 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							FriendLabelList.add(new FriendLabel(cm.img, profile[0], profile[1]));
+							FriendLabelList.add(new FriendLabel(mainView, cm.img, profile[0], profile[1]));
 						}
 						break;
 					
+						
+					case "30": // 프로필 변경
+						System.out.println(cm.getId() + "님이 프로필 변경");
+						for (FriendLabel friendlabel : FriendLabelList) {
+							// TODO FrinedLabel에 있는 ImgLable 변경
+						}
+						break;
+						
 						
 					case "50":
 						List<String> ul =Arrays.asList(cm.userlist.split(" "));
@@ -170,7 +178,7 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel 복사
-							FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
+							FriendLabel drl = new FriendLabel(mainView, label.getProfile(), label.getUserName(), label.getStatus());
 							if (ul.contains(label.getUserName())) {
 								drl.checkbox.setEnabled(false);
 							}
