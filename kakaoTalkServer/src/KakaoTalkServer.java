@@ -304,8 +304,12 @@ public class KakaoTalkServer extends JFrame {
 						
 						break;
 
-
-						
+					case "30":
+						for (int i = 0; i < UserVec.size(); i++) {
+							UserService user = UserVec.elementAt(i);
+							user.WriteAllObject(cm);
+						}
+						break;
 					case "50": // 방 참여자 목록 요청
 						for (int i = 0; i < RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
@@ -381,7 +385,11 @@ public class KakaoTalkServer extends JFrame {
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
+						
+					
+					
 					}
+					
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");
 					try {

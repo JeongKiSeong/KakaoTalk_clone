@@ -36,6 +36,7 @@ public class ChatView extends JFrame {
 	private ImageIcon chat_userlist_clicked = new ImageIcon("./img/chat_userlist_clicked.png");
 	
 	private JButton sendBtn;
+	private JButton fileBtn;
 	private JButton imgBtn;
 	private JButton emoteBtn;
 	private JTextPane textPane;
@@ -113,12 +114,13 @@ public class ChatView extends JFrame {
 		emoteBtn.addActionListener(new AnotherSendAction());
 		
 		// 파일 버튼
-		JButton fileBtn = new JButton(chat_file);
+		fileBtn = new JButton(chat_file);
 		chatOptionPanel.add(fileBtn);
 		fileBtn.setRolloverIcon(chat_file_clicked);
 		fileBtn.setBorderPainted(false);
 		fileBtn.setBounds(52, 3, 37, 37);
 		fileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		fileBtn.addActionListener(new AnotherSendAction());
 		
 		// 사진 버튼
 		imgBtn = new JButton(chat_img);
@@ -286,10 +288,24 @@ public class ChatView extends JFrame {
 				mainView.sendObject(cm);
 			}
 			
+			if(e.getSource()==fileBtn) {
+				Frame frame = new Frame("파일첨부");
+				fileDialog = new FileDialog(frame, "파일 선택", FileDialog.LOAD);
+				fileDialog.setVisible(true);
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "230", "FILE");
+				cm.room_id = room_id;
+				cm.img = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
+				cm.profile = mainView.getProfile();
+				
+				mainView.sendObject(cm);
+			}
+			
 			// 이모티콘 버튼
 			if (e.getSource() == emoteBtn) {
 				new EmoticonDialog(chatView);
 			}
+			
+			
 		}
 	}
 	
