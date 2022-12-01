@@ -380,6 +380,11 @@ public class KakaoTalkServer extends JFrame {
 						ChatVec.add(cm);
 						sendToRoomUser(cm);
 						break;
+						
+					case "220": // ÆÄÀÏ
+						ChatVec.add(cm);
+						sendToRoomUser(cm);
+						break;
 					}
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");

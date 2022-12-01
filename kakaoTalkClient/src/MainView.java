@@ -120,7 +120,7 @@ public class MainView extends JFrame {
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
  						msg = String.format("[%s] [%s] %s", cm.getCode(), cm.getId(), cm.getData());
-						System.out.println(msg);
+						//System.out.println(msg);
 					} else
 						continue;
 					
@@ -225,7 +225,13 @@ public class MainView extends JFrame {
 								}
 							}
 						}
-						break;							
+						break;			
+						
+					case "220": //파일
+						System.out.println("파일명 : " + cm.file.getName());
+						//cm.file.createNewFile();
+							
+						break;
 					}
 				} catch (IOException e) {
 					try {

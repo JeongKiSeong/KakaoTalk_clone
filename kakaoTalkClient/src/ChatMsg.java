@@ -1,6 +1,7 @@
 
 
 // ChatMsg.java 채팅 메시지 ObjectStream 용.
+import java.io.File;
 import java.io.Serializable;
 import java.util.Calendar;
 
@@ -12,6 +13,7 @@ class ChatMsg implements Serializable {
 	private String code;
 	private String data;
 	public ImageIcon img;
+	public File file;
 	public ImageIcon profile;
 	public String userlist;	
 	public String room_id;
