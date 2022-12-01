@@ -157,14 +157,14 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							ImageIcon round_img = new MakeRoundedCorner(cm.img, 30).run();
-							FriendLabelList.add(new FriendLabel(mainView, round_img, profile[0], profile[1]));
+							// TODO 프로필 둥글게
+							//ImageIcon round_img = new MakeRoundedCorner(cm.img, 30).run();
+							FriendLabelList.add(new FriendLabel(mainView, cm.img, profile[0], profile[1]));
 						}
 						break;
 					
 						
 					case "30": // 프로필, 이름, 상태 변경
-						System.out.println(cm.getId() + "님이 프로필 변경");
 						for (FriendLabel friendlabel : FriendLabelList) {
 							// TODO FrinedLabel에 있는 ImgLable 변경
 							if (friendlabel.getUserName().equals(cm.getId())) {

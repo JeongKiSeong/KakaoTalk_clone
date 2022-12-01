@@ -253,11 +253,13 @@ public class KakaoTalkServer extends JFrame {
 						for (int i = 0; i < LogoutVec.size(); i++) {
 							UserService user = LogoutVec.elementAt(i);
 							if (user.UserName.equals(cm.getId())) { 
+								// 발견하면 그 사용자를 로그아웃 벡터에서 제거하고 
+								// 유저벡터에 추가한 this를 유저벡터에서 제거
 								this.UserName = user.UserName;
 								this.UserStatus = user.UserStatus;
 								this.ProfileImg = user.ProfileImg;
 								found = true;
-								LogoutVec.remove(this); // 로그아웃 벡터에서 제거
+								LogoutVec.remove(user); // 로그아웃 벡터에서 제거
 								
 								//System.out.println("이미 존재하던 사용자");
 								break;
@@ -305,6 +307,8 @@ public class KakaoTalkServer extends JFrame {
 
 						
 					case "30": // 프로필 변경
+						this.ProfileImg = cm.img;
+						this.UserStatus = cm.getData();
 						WriteAllObject(cm);
 						break;
 						
