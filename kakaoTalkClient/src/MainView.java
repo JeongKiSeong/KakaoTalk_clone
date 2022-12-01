@@ -44,7 +44,7 @@ public class MainView extends JFrame {
 	
 	private String userName = "기본 이름";
 	private String userStatus = "기본 상태메시지";
-	private  ImageIcon profileImg = profile_default;
+	private ImageIcon profileImg = profile_default;
 	
 	private List<FriendLabel> FriendLabelList = new ArrayList<FriendLabel>();
 	private List<RoomLabel> RoomLabelList = new ArrayList<RoomLabel>();
@@ -151,24 +151,11 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							FriendLabelList.add(new FriendLabel(mainView,cm.img, profile[0], profile[1]));
+							FriendLabelList.add(new FriendLabel(cm.img, profile[0], profile[1]));
 						}
 						break;
 					
-					case "30":
-						System.out.println("name="+userName);
-						for(int i=0;i<FriendLabelList.size();i++)
-						{
-							FriendLabel la=FriendLabelList.get(i);
-							if(userName.equals(la.getUserName()))
-							{
-								System.out.println("name="+la.getUserName());
-								System.out.println("profile="+la.getProfile());
-							}
-							
-							profileImg=la.profile;
-						}
-						break;
+						
 					case "50":
 						List<String> ul =Arrays.asList(cm.userlist.split(" "));
 						DialogFriendLabelList.removeAll(DialogFriendLabelList);
@@ -183,7 +170,7 @@ public class MainView extends JFrame {
 						
 						for (FriendLabel label : FriendLabelList) {
 							// FriendLabel 복사
-							FriendLabel drl = new FriendLabel(mainView,label.getProfile(), label.getUserName(), label.getStatus());
+							FriendLabel drl = new FriendLabel(label.getProfile(), label.getUserName(), label.getStatus());
 							if (ul.contains(label.getUserName())) {
 								drl.checkbox.setEnabled(false);
 							}

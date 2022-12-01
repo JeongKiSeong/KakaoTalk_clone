@@ -1,47 +1,32 @@
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 public class FriendLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 	
-	//private ImageIcon status_red = new ImageIcon("./img/status_red.png");
-	//private ImageIcon status_green = new ImageIcon("./img/status_green.png");
+	private ImageIcon status_red = new ImageIcon("./img/status_red.png");
+	private ImageIcon status_green = new ImageIcon("./img/status_green.png");
 	public JCheckBox checkbox;
 	private String userName; 
-	public ImageIcon profile; 
+	private ImageIcon profile; 
 	private String status;
-	private JLabel imgLabel;
-	private MainView mainView;
-
-
-	public FriendLabel(MainView mainView,ImageIcon img, String bigText, String smallText) {
+	
+	public FriendLabel(ImageIcon img, String bigText, String smallText) {
 		this.profile = img;
 		this.userName = bigText;
 		this.status = smallText;
-		this.mainView=mainView;
 		setOpaque(true);
 		setBackground(Color.WHITE);
 		//setBorder(BorderFactory.createLineBorder(Color.black));
@@ -50,15 +35,7 @@ public class FriendLabel extends JLabel {
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		Image image=img.getImage();
-		BufferedImage bi = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
-		Graphics bg = bi.getGraphics();
-		bg.drawImage(image, 0, 0, null);
-		bg.dispose();
-		BufferedImage bi2=makeRoundedCorner(bi,30);
-		ImageIcon icon=new ImageIcon(bi2);
-		imgLabel= new JLabel(icon);
-		
+		JLabel imgLabel = new JLabel(img);
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
@@ -109,48 +86,23 @@ public class FriendLabel extends JLabel {
 		    }
 		});
 	}
-	public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
-	    int w = image.getWidth();
-	    int h = image.getHeight();
-	    BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-	    Graphics2D g2 = output.createGraphics();
-
-	    // This is what we want, but it only does hard-clipping, i.e. aliasing
-	    // g2.setClip(new RoundRectangle2D ...)
-
-	    // so instead fake soft-clipping by first drawing the desired clip shape
-	    // in fully opaque white with antialiasing enabled...
-	    g2.setComposite(AlphaComposite.Src);
-	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	    g2.setColor(Color.WHITE);
-	    g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius));
-
-	    // ... then compositing the image on top,
-	    // using the white shape from above as alpha source
-	    g2.setComposite(AlphaComposite.SrcAtop);
-	    g2.drawImage(image, 0, 0, null);
-
-	    g2.dispose();
-
-	    return output;
-	}
 
 	// 프로필 띄울 프레임
 	class ProfileFrame extends JFrame {
 		private static final long serialVersionUID = 1L;
-		private ImageIcon imgicon;
+
 		public ProfileFrame(ImageIcon profile, String name, String status) {
 			setTitle("프로필");
 			setSize(300, 300);
 			setVisible(true);
-			imgicon=profile;
+			
 			JPanel panel = new JPanel();
 			add(panel);
 			panel.setBackground(Color.WHITE);
 			panel.setLayout(null);
 			
-			JLabel imgLabel = new JLabel(imgicon);
+
+			JLabel imgLabel = new JLabel(profile);
 			panel.add(imgLabel);
 			imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			imgLabel.setBounds(114, 36, 61, 56);
@@ -159,48 +111,24 @@ public class FriendLabel extends JLabel {
 			JLabel nameLabel = new JLabel(name);
 			panel.add(nameLabel);
 			nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-			nameLabel.setBounds(100, 103, 90, 34);
+			nameLabel.setBounds(100, 133, 90, 34);
 			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//nameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 			JLabel statusLabel = new JLabel(status);
 			panel.add(statusLabel);
-			statusLabel.setBounds(58, 137, 172, 29);
+			statusLabel.setBounds(58, 177, 172, 29);
 			statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			JButton updateprofile=new JButton("프로필 변경");
-			panel.add(updateprofile);
-			updateprofile.setBounds(58, 177, 172, 29);
-			updateprofile.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-			updateprofile.setHorizontalAlignment(SwingConstants.CENTER);
-			
-			updateprofile.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					JButton btn=(JButton)e.getSource();
-					if(btn.equals(updateprofile))
-					{
-						Frame frame = new Frame("이미지첨부");
-						FileDialog fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
-						fileDialog.setVisible(true);
-						imgicon=new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
-						imgLabel.setIcon(imgicon);
-						ChatMsg msg=new ChatMsg(userName, "30", "프로필 변경됨");
-						msg.profile=imgicon;
-						mainView.sendObject(msg);
-					}
-					
-				}
-			});
 			// TODO 레이블에 마우스 리스너 달기 -> 클릭하면 프사 확대
 			// TODO 내 프로필 변경 -> userName == name이면 변경버튼 추가 or 레이블 클릭시 변경창
 			imgLabel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent  e) {
 					Point location = getLocationOnScreen();
-					new ProfileZoom(imgicon).setLocation(location.x + getWidth() + 20, location.y);
+					new ProfileZoom(profile).setLocation(location.x + getWidth() + 20, location.y);
 					//frame.setVisible(false);
 				}
 			});
