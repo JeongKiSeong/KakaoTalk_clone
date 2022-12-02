@@ -15,6 +15,7 @@ public class RoomLabel extends JLabel {
 	private String roomName;
 	private ChatView chatView;
 	private JLabel smallTextLabel;
+	private JLabel bigTextLabel;
 
 	public RoomLabel(MainView mainView, ChatView cv, ImageIcon img, String roomName, String id) {
 		this.roomImg = img;
@@ -34,7 +35,7 @@ public class RoomLabel extends JLabel {
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
-		JLabel bigTextLabel = new JLabel(roomName);
+		bigTextLabel = new JLabel(roomName);
 		this.add(bigTextLabel);
 		bigTextLabel.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
 		bigTextLabel.setBounds(80, 10, 180, 25);
@@ -79,5 +80,9 @@ public class RoomLabel extends JLabel {
 	
 	public void setLastMsg(String lastMsg) {
 		smallTextLabel.setText(lastMsg);
+	}
+	
+	public void setRoomName(String roomName) {
+		bigTextLabel.setText(roomName);
 	}
 }
