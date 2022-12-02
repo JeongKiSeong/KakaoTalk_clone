@@ -188,6 +188,11 @@ public class MainView extends JFrame {
 								msgStatusPanel.replaceImage(cm.getId(), cm.img);
 							}
 						}
+						break;
+						
+						
+					case "40": // 방 정보 변경
+						
 						
 						break;
 						
@@ -226,6 +231,7 @@ public class MainView extends JFrame {
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;
+						
 						
 					// 일반 메시지
 					case "200":
