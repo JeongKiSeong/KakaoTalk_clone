@@ -1,12 +1,15 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
@@ -31,9 +34,22 @@ public class RoomLabel extends JLabel {
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		JLabel imgLabel = new JLabel(roomImg);
-		this.add(imgLabel);
-		imgLabel.setBounds(5, 5, 61, 61);
+		JPanel imgPanel=new JPanel() {
+			
+			@Override
+			protected void paintComponent(Graphics g) {
+				// TODO Auto-generated method stub
+				super.paintComponent(g);
+				g.drawImage(roomImg.getImage(),0,0,getWidth()/2-2,getHeight()/2-2,this);
+				g.drawImage(roomImg.getImage(),getWidth()/2+2,0,getWidth()/2-2,getHeight()/2-2,this);
+				g.drawImage(roomImg.getImage(),0,getHeight()/2+2,getWidth()/2-2,getHeight()/2-2,this);
+				g.drawImage(roomImg.getImage(),getWidth()/2+2,getHeight()/2+2,getWidth()/2-2,getHeight()/2-2,this);
+			}
+		};
+		
+		//JLabel imgLabel = new JLabel(roomImg);
+		this.add(imgPanel);
+		imgPanel.setBounds(5, 5, 61, 61);
 		
 		JLabel bigTextLabel = new JLabel(roomName);
 		this.add(bigTextLabel);

@@ -205,6 +205,8 @@ public class MainView extends JFrame {
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
 						String roomName = cm.getData();
 						ChatView cv= new ChatView(mainView, cm.room_id, roomName);
+						
+						//profile_default 이미지로 채팅방 이미지 생성 
 						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, "방 번호 : " + cm.room_id, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
