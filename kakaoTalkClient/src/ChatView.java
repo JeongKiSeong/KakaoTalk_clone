@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -46,6 +48,7 @@ public class ChatView extends JFrame {
 	private ChatView chatView;
 	private FriendDialog friendDialog;
 	private String room_name;
+	private List<MsgStatusPanel> msgStatusPanelList = new ArrayList<MsgStatusPanel>();
 	
 	
 	public ChatView(MainView mainView, String room_id, String room_name) {
@@ -176,7 +179,9 @@ public class ChatView extends JFrame {
 	
 	public void AppendTextLeft(ImageIcon profile, String name, String text, String time) {
 		SetLeftAlign();
-		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
+		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(profile, name, time);
+		msgStatusPanelList.add(msgStatusPanel);
+		textPane.insertComponent(msgStatusPanel);
 		addComponent(textPane, null);
 		addComponent(textPane, new MsgLabel(text, "L"));
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -191,7 +196,9 @@ public class ChatView extends JFrame {
 	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon, String time) {
 		SetLeftAlign();
 		addComponent(textPane, null);
-		textPane.insertComponent(new MsgStatusPanel(profile, name, time));
+		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(profile, name, time);
+		msgStatusPanelList.add(msgStatusPanel);
+		textPane.insertComponent(msgStatusPanel);
 		addComponent(textPane, null);
 		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
@@ -280,7 +287,7 @@ public class ChatView extends JFrame {
 				Frame frame = new Frame("이미지첨부");
 				FileDialog fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
 				fileDialog.setVisible(true);
-				ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "IMG");
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "210", "사진을 보냈습니다.");
 				cm.room_id = room_id;
 				cm.img = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
 				cm.profile = mainView.getProfile();
@@ -299,7 +306,7 @@ public class ChatView extends JFrame {
 				fileDialog.setVisible(true);
 				
 				// 220 으로 파일 전송
-				ChatMsg cm = new ChatMsg(mainView.getUserName(), "220", "File");
+				ChatMsg cm = new ChatMsg(mainView.getUserName(), "220", "파일을 보냈습니다.");
 				cm.room_id = chatView.getRoomId();
 				cm.profile = mainView.getProfile();
 				cm.file = new File(fileDialog.getDirectory() + fileDialog.getFile());
@@ -358,6 +365,10 @@ public class ChatView extends JFrame {
 	
 	public MainView getMainVeiw() {
 		return mainView;
+	}
+	
+	public List<MsgStatusPanel> getMsgStatusPanel() {
+		return msgStatusPanelList;
 	}
 	
 }
