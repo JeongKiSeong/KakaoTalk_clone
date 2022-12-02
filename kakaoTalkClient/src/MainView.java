@@ -192,7 +192,11 @@ public class MainView extends JFrame {
 						
 						
 					case "40": // 방 정보 변경
-						
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (roomLabel.getRoomId().equals(cm.room_id)) {
+								roomLabel.setRoomName(cm.getData());
+							}
+						}
 						
 						break;
 						
