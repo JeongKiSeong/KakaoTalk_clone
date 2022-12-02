@@ -320,18 +320,6 @@ public class KakaoTalkServer extends JFrame {
 						}
 						break;
 						
-					
-					case "40":
-						for (int i = 0; i < RoomVec.size(); i++) {
-							RoomData room = RoomVec.elementAt(i);
-							if (cm.room_id.equals(room.getRoomId())) { 
-								room.room_name = cm.getData();
-								break;
-							}
-						}
-						WriteAllObject(cm); 
-						break;
-						
 						
 					case "50": // 방 참여자 목록 요청
 						for (int i = 0; i < RoomVec.size(); i++) {

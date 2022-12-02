@@ -143,23 +143,10 @@ public class ChatView extends JFrame {
 		chatInfoPanel.setLayout(null);
 		
 		// 방 이름 버튼
-		JLabel roomNameLabel = new JLabel(room_name);
-		chatInfoPanel.add(roomNameLabel);
-		roomNameLabel.setBounds(12, 10, 227, 23);
-		roomNameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-		roomNameLabel.addMouseListener(new MouseAdapter() { 
-		    public void mouseClicked(MouseEvent e) {
-		    	String input = JOptionPane.showInputDialog(null,
-		    			"", "방 이름 변경", JOptionPane.INFORMATION_MESSAGE);
-		    	
-		    	if (input != null) {
-					ChatMsg msg = new ChatMsg(mainView.getUserName(), "40", input);
-					msg.room_id = room_id;
-					mainView.sendObject(msg);
-					roomNameLabel.setText(input);
-		    	}
-		    }
-		});
+		JLabel lblNewLabel = new JLabel(room_name);
+		chatInfoPanel.add(lblNewLabel);
+		lblNewLabel.setBounds(12, 10, 227, 23);
+		lblNewLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 		
 		// 초대 버튼
 //		JButton addFriendBtn = new JButton(main_addFriend);
@@ -192,7 +179,7 @@ public class ChatView extends JFrame {
 	
 	public void AppendTextLeft(ImageIcon profile, String name, String text, String time) {
 		SetLeftAlign();
-		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(chatView, profile, name, time);
+		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(profile, name, time);
 		msgStatusPanelList.add(msgStatusPanel);
 		textPane.insertComponent(msgStatusPanel);
 		addComponent(textPane, null);
@@ -209,11 +196,11 @@ public class ChatView extends JFrame {
 	public void AppendImageLeft(ImageIcon profile, String name, ImageIcon ori_icon, String time) {
 		SetLeftAlign();
 		addComponent(textPane, null);
-		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(chatView, profile, name, time);
+		MsgStatusPanel msgStatusPanel = new MsgStatusPanel(profile, name, time);
 		msgStatusPanelList.add(msgStatusPanel);
 		textPane.insertComponent(msgStatusPanel);
-		AppendImage(ori_icon);
 		addComponent(textPane, null);
+		AppendImage(ori_icon);
 		textPane.setCaretPosition(textPane.getDocument().getLength());
 	}
 	

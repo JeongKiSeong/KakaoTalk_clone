@@ -3,7 +3,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
@@ -142,25 +141,9 @@ public class FriendLabel extends JLabel {
 			statusLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 			statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			//statusLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			 
 			
 			if (userName.equals(mainView.getUserName())) {
-				// 상태메시지 변경
-				statusLabel.addMouseListener(new MouseAdapter() {  
-				    public void mouseClicked(MouseEvent e) {
-				    	String input = JOptionPane.showInputDialog(null,
-				    			"", "상태메시지 변경", JOptionPane.INFORMATION_MESSAGE);
-				    	
-				    	if (input != null) {
-							ChatMsg msg = new ChatMsg(userName, "30", input);
-							msg.img = mainView.getProfile();
-							mainView.sendObject(msg);
-							statusLabel.setText(input);
-				    	}
-				    }
-				});
-				
-				JButton updateprofileBtn=new JButton("사진 변경");
+				JButton updateprofileBtn=new JButton("프로필 변경");
 				panel.add(updateprofileBtn);
 				updateprofileBtn.setBounds(58, 200, 172, 29);
 				updateprofileBtn.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
@@ -174,35 +157,32 @@ public class FriendLabel extends JLabel {
 							Frame frame = new Frame("이미지첨부");
 							FileDialog fileDialog = new FileDialog(frame, "이미지 선택", FileDialog.LOAD);
 							fileDialog.setVisible(true);
+							imgicon = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
 							
-							if (fileDialog.getFile() != null) {
-								imgicon = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
-								
-								
-								int width = imgicon.getIconWidth();
-								int height = imgicon.getIconHeight();
-								double ratio;
-								Image img = imgicon.getImage();
-								// Image가 너무 크면 최대 가로 또는 세로 200 기준으로 축소시킨다.
-								if (width > 61 || height > 61) {
-									if (width > height) { // 가로 사진
-										ratio = (double) height / width;
-										width = 61;
-										height = (int) (width * ratio);
-									} else { // 세로 사진
-										ratio = (double) width / height;
-										height = 61;
-										width = (int) (height * ratio);
-									}
-									Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-									imgicon = new ImageIcon(new_img);
+							
+							int width = imgicon.getIconWidth();
+							int height = imgicon.getIconHeight();
+							double ratio;
+							Image img = imgicon.getImage();
+							// Image가 너무 크면 최대 가로 또는 세로 200 기준으로 축소시킨다.
+							if (width > 61 || height > 61) {
+								if (width > height) { // 가로 사진
+									ratio = (double) height / width;
+									width = 61;
+									height = (int) (width * ratio);
+								} else { // 세로 사진
+									ratio = (double) width / height;
+									height = 61;
+									width = (int) (height * ratio);
 								}
-								
-								imgLabel.setIcon(imgicon);
-								ChatMsg msg=new ChatMsg(userName, "30", status);
-								msg.img = imgicon;
-								mainView.sendObject(msg);
+								Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+								imgicon = new ImageIcon(new_img);
 							}
+							
+							imgLabel.setIcon(imgicon);
+							ChatMsg msg=new ChatMsg(userName, "30", status);
+							msg.img = imgicon;
+							mainView.sendObject(msg);
 						}
 						
 					}

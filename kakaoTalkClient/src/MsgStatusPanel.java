@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -13,7 +11,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 import utils.ResizedImage;
 
@@ -26,10 +23,8 @@ import utils.ResizedImage;
 public class MsgStatusPanel extends JPanel {
 	private JLabel profileLabel;
 	private JLabel nameLabel;
-	private MainView mainView;
 	
-	public MsgStatusPanel(ChatView chatView, ImageIcon profile, String name, String time) {
-		this.mainView = chatView.getMainVeiw();
+	public MsgStatusPanel(ImageIcon profile, String name, String time) {
 		setLayout(null);
 		setBackground(new Color(186, 206, 224));
 		setBounds(0, 0, 170, 60);
@@ -54,13 +49,6 @@ public class MsgStatusPanel extends JPanel {
 		timeLabel.setText(time);
 		timeLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		
-		
-		// 프로필 클릭 시 뜨는 프로필 화면
-//		profileLabel.addMouseListener(new MouseAdapter() { 
-//		    public void mouseClicked(MouseEvent e) {
-//		    	
-//		    }
-//		});
 	}
 	
 	
