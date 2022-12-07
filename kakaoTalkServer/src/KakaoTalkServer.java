@@ -367,11 +367,6 @@ public class KakaoTalkServer extends JFrame {
 						break;
 
 						
-					case "10": // 프로필 로딩
-						ReloadProfile();
-						break;
-				
-						
 					case "30": // 프로필 변경
 						this.ProfileImg = cm.img;
 						this.UserStatus = cm.getData();
@@ -517,7 +512,7 @@ public class KakaoTalkServer extends JFrame {
 							for (int j = 0; j < user_vc.size(); j++) {
 								UserService user = (UserService) user_vc.elementAt(j);
 								if (user.UserName.equals(data[i])) { 
-									ChatMsg cm90 = new ChatMsg("SERVER", "60", cm.getData());
+									ChatMsg cm90 = new ChatMsg("SERVER", "60", r.room_name);
 									cm90.userlist = String.join(" ", r.getUserlist());
 									cm90.room_id = r.getRoomId();
 									cm90.img = r.room_img;
