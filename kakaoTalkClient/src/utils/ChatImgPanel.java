@@ -10,17 +10,30 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 
-public class MakeRoundedCorner {
-	private ImageIcon img;
-	private int cornerRadius;
+public class ChatImgPanel extends JPanel {
+	private ImageIcon one = null;
 	
-	public MakeRoundedCorner(ImageIcon img, int cornerRadius) {
-		this.img = img;
-		this.cornerRadius = cornerRadius;
+	public ChatImgPanel(ImageIcon one) {
+		this.one = makeRoundedCorner(one, 30);
+		
+		this.setBorder(new RoundedBorder(Color.black, 1, 20));
+		this.setBounds(5, 5, 61, 61);
+		this.setBackground(Color.white);
 	}
 	
-	public ImageIcon run() {
+
+	@Override
+    protected void paintComponent(Graphics g) {
+       // TODO Auto-generated method stub
+       super.paintComponent(g);
+       // 61, 61
+       
+       g.drawImage(one.getImage(),0,0,61,61,this);
+    }
+	
+	public ImageIcon makeRoundedCorner(ImageIcon img, int cornerRadius) {
 		Image image = img.getImage();
 		BufferedImage bi = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
 		Graphics bg = bi.getGraphics();

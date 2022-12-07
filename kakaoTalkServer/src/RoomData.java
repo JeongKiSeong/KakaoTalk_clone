@@ -13,6 +13,7 @@ public class RoomData implements Serializable {
 	
 	private String room_id;
 	public String room_name;
+	public ImageIcon room_img;
 	private ArrayList<String> userlist;
 	// 유저별 입장 시간
 	private Hashtable<String, Calendar> enterTime = new Hashtable<String, Calendar>();
