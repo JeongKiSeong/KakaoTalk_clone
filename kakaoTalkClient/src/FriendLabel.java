@@ -6,20 +6,28 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.LineBorder;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 
-import utils.MakeRoundedCorner;
+import utils.RoundedBorder;
 
 public class FriendLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
@@ -48,7 +56,9 @@ public class FriendLabel extends JLabel {
 		setMinimumSize(new Dimension(280, 70));
 		
 		imgLabel = new JLabel(profile);
+		imgLabel.setBorder(new RoundedBorder(Color.black, 1, 20));
 		this.add(imgLabel);
+		imgLabel.setHorizontalAlignment(CENTER);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
 		nameLabel = new JLabel(userName);
@@ -125,8 +135,9 @@ public class FriendLabel extends JLabel {
 
 			JLabel imgLabel = new JLabel(profile);
 			panel.add(imgLabel);
+			imgLabel.setBorder(new RoundedBorder(Color.black, 1, 20));
 			imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			imgLabel.setBounds(114, 36, 61, 56);
+			imgLabel.setBounds(114, 36, 61, 61);
 			//imgLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
 			JLabel nameLabel = new JLabel(userName);
@@ -179,26 +190,7 @@ public class FriendLabel extends JLabel {
 								imgicon = new ImageIcon(fileDialog.getDirectory() + fileDialog.getFile());
 								
 								
-								int width = imgicon.getIconWidth();
-								int height = imgicon.getIconHeight();
-								double ratio;
-								Image img = imgicon.getImage();
-								// Image가 너무 크면 최대 가로 또는 세로 200 기준으로 축소시킨다.
-								if (width > 61 || height > 61) {
-									if (width > height) { // 가로 사진
-										ratio = (double) height / width;
-										width = 61;
-										height = (int) (width * ratio);
-									} else { // 세로 사진
-										ratio = (double) width / height;
-										height = 61;
-										width = (int) (height * ratio);
-									}
-									Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-									imgicon = new ImageIcon(new_img);
-								}
-								
-								imgLabel.setIcon(imgicon);
+								imgLabel.setIcon(resizeImage(imgicon));
 								ChatMsg msg=new ChatMsg(userName, "30", status);
 								msg.img = imgicon;
 								mainView.sendObject(msg);
@@ -221,19 +213,14 @@ public class FriendLabel extends JLabel {
 			
 		public class ProfileZoom extends JFrame {
 			public ProfileZoom() {
+				ImageIcon profile = mainView.getProfile();
 				setTitle("프로필");
-				setSize(300, 300);
+				setSize(profile.getIconWidth(), profile.getIconHeight());
 				setResizable(false);
 				setVisible(true);
 				
-				//TODO 사진 확대할 때도 비율 유지하도록 변경해야 함
-				Image img = profile.getImage();
-				// 창의 사이즈인 300, 300에 맞춰서 이미지를 변경
-				Image changeImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
-				ImageIcon changeIcon = new ImageIcon(changeImg);
-				
-				JLabel jprofile=new JLabel(changeIcon);
-				add(jprofile);
+				JLabel profileLabel=new JLabel(profile);
+				add(profileLabel);
 			}
 		}
 	}
@@ -256,4 +243,26 @@ public class FriendLabel extends JLabel {
 	public String getStatus() {
 		return status;
 	}
+	public ImageIcon resizeImage(ImageIcon imgIcon) {
+		ImageIcon imageicon = imgIcon;
+		int width = imageicon.getIconWidth();
+		int height = imageicon.getIconHeight();
+		double ratio;
+		Image img = imageicon.getImage();
+		if (width > 61 || height > 61) {
+			if (width > height) { // 가로 사진
+				ratio = (double) height / width;
+				width = 61;
+				height = (int) (width * ratio);
+			} else { // 세로 사진
+				ratio = (double) width / height;
+				height = 61;
+				width = (int) (height * ratio);
+			}
+			Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			imageicon = new ImageIcon(new_img);
+		}
+		return imageicon;
+	}
 }
+

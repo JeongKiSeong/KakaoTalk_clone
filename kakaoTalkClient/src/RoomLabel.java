@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import utils.RoundedBorder;
+
 public class RoomLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 	private ImageIcon roomImg;
@@ -32,6 +34,7 @@ public class RoomLabel extends JLabel {
 		setMinimumSize(new Dimension(280, 70));
 		
 		JLabel imgLabel = new JLabel(roomImg);
+		imgLabel.setBorder(new RoundedBorder(Color.black, 1, 20));
 		this.add(imgLabel);
 		imgLabel.setBounds(5, 5, 61, 61);
 		
