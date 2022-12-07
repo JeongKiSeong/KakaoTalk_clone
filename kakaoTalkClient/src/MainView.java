@@ -213,13 +213,20 @@ public class MainView extends JFrame {
 						break;
 						
 						
-					case "40": // 방 정보 변경
+					case "40": // 방 이름 변경
 						for (RoomLabel roomLabel : RoomLabelList) {
 							if (roomLabel.getRoomId().equals(cm.room_id)) {
 								roomLabel.setRoomName(cm.getData());
 							}
 						}
+						break;
 						
+					case "41": // 방 사진 변경
+						for (RoomLabel roomLabel : RoomLabelList) {
+							if (roomLabel.getRoomId().equals(cm.room_id)) {
+								roomLabel.setRoomImg(cm.img);
+							}
+						}
 						break;
 						
 						
@@ -253,7 +260,7 @@ public class MainView extends JFrame {
 						// TODO 참여자 프로필도 합쳐서 방 사진으로 해야함
 						String roomName = cm.getData();
 						ChatView cv= new ChatView(mainView, cm.room_id, roomName);
-						RoomLabel rl = new RoomLabel(mainView, cv, profile_default, roomName, cm.room_id);
+						RoomLabel rl = new RoomLabel(mainView, cv, cm.img, roomName, cm.room_id);
 						RoomLabelList.add(rl);
 						addComponent(roomTextPane, rl);
 						break;

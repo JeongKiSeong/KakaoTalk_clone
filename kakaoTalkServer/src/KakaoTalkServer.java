@@ -1,6 +1,12 @@
 //JavaObjServer.java ObjectStream 기반 채팅 Server
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,6 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -225,6 +233,57 @@ public class KakaoTalkServer extends JFrame {
 			WriteAllObject(new ChatMsg("SERVER", "0", "### 끝 ###"));
 		}
 		
+		public ImageIcon makeRoundedCorner(ImageIcon img, int cornerRadius) {
+			Image image = img.getImage();
+			int size = image.getHeight(null) > image.getWidth(null) ? image.getHeight(null) : image.getWidth(null);
+			BufferedImage output = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+			
+			int w = output.getWidth();
+		    int h = output.getHeight();
+		    Graphics2D g2 = output.createGraphics();
+
+		    g2.setComposite(AlphaComposite.Src);
+		    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		    g2.setColor(Color.WHITE);
+		    g2.fill(new RoundRectangle2D.Float(0, 0, size, size, cornerRadius, cornerRadius));
+
+		    g2.setComposite(AlphaComposite.SrcAtop);
+		    g2.drawImage(image, (size-image.getWidth(null)), 0, null);
+
+		    g2.dispose();
+
+		    
+		    ImageIcon new_profile=new ImageIcon(output);
+		    return new_profile;
+		}
+		
+		public ImageIcon createRoomImg(List<ImageIcon> imgList) {
+			
+			BufferedImage off_Image = new BufferedImage(61, 61, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = off_Image.createGraphics();
+			g.setColor(Color.white);
+			g.fillRect(0, 0, 61, 61);
+			
+			if (imgList.size() == 1) { // 1인
+				g.drawImage(imgList.get(0).getImage(),0,0,61,61,null);
+			} else if (imgList.size() == 2) { // 2인
+				g.drawImage(imgList.get(0).getImage(),0,0,35,35,null);
+		        g.drawImage(imgList.get(1).getImage(),26,26,35,35,null);
+			} else if (imgList.size() == 3) { // 3인
+				g.drawImage(imgList.get(0).getImage(),16,1,29,29,null);
+	            g.drawImage(imgList.get(1).getImage(),1,31,29,29,null);
+	            g.drawImage(imgList.get(2).getImage(),31,31,29,29,null);
+			} else { // 4인 이상
+	            g.drawImage(imgList.get(0).getImage(),0,0,61/2-1,61/2-1,null);
+	            g.drawImage(imgList.get(1).getImage(),61/2+1,0,61/2-1,61/2-1,null);
+	            g.drawImage(imgList.get(2).getImage(),0,61/2+1,61/2-1,61/2-1,null);
+	            g.drawImage(imgList.get(3).getImage(),61/2+1,61/2+1,61/2-1,61/2-1,null);
+			}
+
+			
+			return new ImageIcon(off_Image);
+		}
+		
 		public void run() {
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
 				try {
@@ -288,6 +347,7 @@ public class KakaoTalkServer extends JFrame {
 									ChatMsg ob = new ChatMsg("SERVER","60", room.room_name);
 									ob.userlist = String.join(" ", room.getUserlist());
 									ob.room_id = room.getRoomId();
+									ob.img = room.room_img;
 									this.WriteOneObject(ob);
 									
 									// 채팅 전송
@@ -324,10 +384,38 @@ public class KakaoTalkServer extends JFrame {
 							if (name.equals(chatMsg.getId()))
 								chatMsg.profile = new ResizedImage(cm.img, 40).run();
 						}
+						
+						
+						for (int i=0; i<RoomVec.size(); i++) {
+							RoomData room = RoomVec.elementAt(i);
+							if (room.getUserlist().contains(name)) {
+								// 방에 프사 변경한 사람이 있으면 방 이미지 변경
+								List<ImageIcon> imgList1 = new ArrayList<ImageIcon>();
+								for (String userName : room.getUserlist()) {
+									for (int j = 0; j < user_vc.size(); j++) {
+										UserService user = (UserService) user_vc.elementAt(j);
+										if (user.UserName.equals(userName)) {
+											imgList1.add(user.ProfileImg);
+										}
+									}
+								}
+								ImageIcon room_img1 = createRoomImg(imgList1);
+								room.room_img = room_img1;
+								
+
+								ChatMsg cm41 = new ChatMsg("SERVER", "41", "방 사진 변경");
+								cm41.img = room.room_img;
+								cm41.room_id = room.getRoomId();
+								WriteAllObject(cm41);
+								
+							}
+						}
+						
+						
 						break;
 						
 					
-					case "40":
+					case "40": // 방 정보 변경
 						for (int i = 0; i < RoomVec.size(); i++) {
 							RoomData room = RoomVec.elementAt(i);
 							if (cm.room_id.equals(room.getRoomId())) { 
@@ -354,6 +442,20 @@ public class KakaoTalkServer extends JFrame {
 					case "60": // 채팅방 생성 요청
 						String userList[] = cm.userlist.split(" ");
 						String roomName = cm.getData();
+						List<ImageIcon> imgList = new ArrayList<ImageIcon>();
+						
+						for (String userName : userList) {
+							for (int i = 0; i < user_vc.size(); i++) {
+								UserService user = (UserService) user_vc.elementAt(i);
+								if (user.UserName.equals(userName)) {
+									//imgList.add(makeRoundedCorner(user.ProfileImg, 20));
+									imgList.add(user.ProfileImg);
+								}
+							}
+						}
+						ImageIcon room_img = createRoomImg(imgList);
+						
+						
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
 							for (int i = 0; i < user_vc.size(); i++) {
@@ -362,11 +464,14 @@ public class KakaoTalkServer extends JFrame {
 									ChatMsg ob = new ChatMsg("SERVER","60", roomName);
 									ob.userlist = cm.userlist;
 									ob.room_id = Integer.toString(roomNum);
+									ob.img = room_img;
 									user.WriteOneObject(ob);
 								}
 							}
 						}
-						RoomVec.add(new RoomData(Integer.toString(roomNum), roomName, userList, cm.time));
+						RoomData roomdata = new RoomData(Integer.toString(roomNum), roomName, userList, cm.time);
+						roomdata.room_img = room_img;
+						RoomVec.add(roomdata);
 						roomNum++;
 						break;
 						
@@ -388,6 +493,24 @@ public class KakaoTalkServer extends JFrame {
 								break;
 							}
 						}
+
+						List<ImageIcon> imgList1 = new ArrayList<ImageIcon>();
+						for (String userName : r.getUserlist()) {
+							for (int i = 0; i < user_vc.size(); i++) {
+								UserService user = (UserService) user_vc.elementAt(i);
+								if (user.UserName.equals(userName)) {
+									imgList1.add(user.ProfileImg);
+								}
+							}
+						}
+						
+						ImageIcon room_img1 = createRoomImg(imgList1);
+						r.room_img = room_img1;
+
+						ChatMsg cm41 = new ChatMsg("SERVER", "41", "방 사진 변경");
+						cm41.img = r.room_img;
+						cm41.room_id = r.getRoomId();
+						WriteAllObject(cm41);
 						
 						// uservc 돌면서 초대된 사람들한테 "60" . userlist랑 room_id 담아서
 						for (int i=0; i<data.length; i++) {
@@ -397,6 +520,7 @@ public class KakaoTalkServer extends JFrame {
 									ChatMsg cm90 = new ChatMsg("SERVER", "60", cm.getData());
 									cm90.userlist = String.join(" ", r.getUserlist());
 									cm90.room_id = r.getRoomId();
+									cm90.img = r.room_img;
 									user.WriteOneObject(cm90);
 								}
 							} 

@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import utils.ResizedImage;
+import utils.RoundedBorder;
 
 // 해쉬태그에 친구 목록을 넣어놓고, 친구 이름으로 서치
 // 벡터로 for 돌면서 해도 됨. 꼭 해쉬태그로 할 필요 없음.
@@ -39,7 +40,7 @@ public class MsgStatusPanel extends JPanel {
 		add(profileLabel);
 		profileLabel.setBounds(0, 10, 40, 40);
 		profileLabel.setBackground(Color.WHITE);
-		profileLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		profileLabel.setBorder(new RoundedBorder(Color.black, 1, 20));
 		profileLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		nameLabel = new JLabel(name);

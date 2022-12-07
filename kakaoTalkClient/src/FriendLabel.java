@@ -200,28 +200,6 @@ public class FriendLabel extends JLabel {
 					}
 				});
 			}
-			
-			imgLabel.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent  e) {
-					Point location = getLocationOnScreen();
-					new ProfileZoom().setLocation(location.x + getWidth() + 20, location.y);
-					//frame.setVisible(false);
-				}
-			});
-		}
-			
-		public class ProfileZoom extends JFrame {
-			public ProfileZoom() {
-				ImageIcon profile = mainView.getProfile();
-				setTitle("ÇÁ·ÎÇÊ");
-				setSize(profile.getIconWidth(), profile.getIconHeight());
-				setResizable(false);
-				setVisible(true);
-				
-				JLabel profileLabel=new JLabel(profile);
-				add(profileLabel);
-			}
 		}
 	}
 	
