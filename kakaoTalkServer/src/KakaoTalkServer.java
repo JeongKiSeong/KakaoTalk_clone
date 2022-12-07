@@ -156,6 +156,7 @@ public class KakaoTalkServer extends JFrame {
 		private ObjectInputStream ois;
 		private ObjectOutputStream oos;
 
+		private Vector user_vc;
 		private Socket client_socket;
 		public String UserName = "";
 		public String UserStatus;
@@ -165,6 +166,7 @@ public class KakaoTalkServer extends JFrame {
 			// TODO Auto-generated constructor stub
 			// 매개변수로 넘어온 자료 저장
 			this.client_socket = client_socket;
+			this.user_vc = UserVec;
 			try {
 				oos = new ObjectOutputStream(client_socket.getOutputStream());
 				oos.flush();
@@ -176,14 +178,14 @@ public class KakaoTalkServer extends JFrame {
 
 		public void Logout() {
 			LogoutVec.add(this); // 로그아웃 벡터에 저장
-			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
+			user_vc.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
 			ReloadProfile();
 		}
 
 		// 모든 User들에게 Object를 방송. 채팅 message와 image object를 보낼 수 있다
 		public void WriteAllObject(Object ob) {
-			for (int i = 0; i < UserVec.size(); i++) {
-				UserService user = UserVec.elementAt(i);
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
 				user.WriteOneObject(ob);
 			}
 		}
@@ -212,8 +214,8 @@ public class KakaoTalkServer extends JFrame {
 		
 		public void ReloadProfile() {
 			WriteAllObject(new ChatMsg("SERVER", "0", "### 시작 ###"));
-			for (int i = 0; i < UserVec.size(); i++) {
-				UserService user = UserVec.elementAt(i);
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
 				AppendText("프로필 전송 중 : " + user.UserName);
 				String message = user.UserName + '|' + user.UserStatus;
 				ChatMsg send = new ChatMsg("SERVER", "0", message);
@@ -304,6 +306,10 @@ public class KakaoTalkServer extends JFrame {
 						
 						break;
 
+						
+					case "10": // 프로필 로딩
+						ReloadProfile();
+						break;
 				
 						
 					case "30": // 프로필 변경
@@ -350,8 +356,8 @@ public class KakaoTalkServer extends JFrame {
 						String roomName = cm.getData();
 						for (String userName : userList) {
 							// 채팅방 참여자들에게 방 번호 전송
-							for (int i = 0; i < UserVec.size(); i++) {
-								UserService user = UserVec.elementAt(i);
+							for (int i = 0; i < user_vc.size(); i++) {
+								UserService user = (UserService) user_vc.elementAt(i);
 								if (user.UserName.equals(userName)) { 
 									ChatMsg ob = new ChatMsg("SERVER","60", roomName);
 									ob.userlist = cm.userlist;
@@ -385,8 +391,8 @@ public class KakaoTalkServer extends JFrame {
 						
 						// uservc 돌면서 초대된 사람들한테 "60" . userlist랑 room_id 담아서
 						for (int i=0; i<data.length; i++) {
-							for (int j = 0; j < UserVec.size(); j++) {
-								UserService user = UserVec.elementAt(j);
+							for (int j = 0; j < user_vc.size(); j++) {
+								UserService user = (UserService) user_vc.elementAt(j);
 								if (user.UserName.equals(data[i])) { 
 									ChatMsg cm90 = new ChatMsg("SERVER", "60", cm.getData());
 									cm90.userlist = String.join(" ", r.getUserlist());
@@ -437,8 +443,8 @@ public class KakaoTalkServer extends JFrame {
 				RoomData room = RoomVec.elementAt(i);
 				if (cm.room_id.equals(room.getRoomId())) {
 					for (String userName : room.getUserlist()) {
-						for (int j = 0; j < UserVec.size(); j++) {
-							UserService user = UserVec.elementAt(j);
+						for (int j = 0; j < user_vc.size(); j++) {
+							UserService user = (UserService) user_vc.elementAt(j);
 							if (user.UserName.equals(userName)) { 
 								user.WriteOneObject(cm);
 							}

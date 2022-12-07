@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -33,7 +34,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import utils.MakeRoundedCorner;
 
 
 // 친구 목록, 채팅 목록 나오는 화면
@@ -71,6 +71,27 @@ public class MainView extends JFrame {
 	}
 	public String getStatus() {
 		return userStatus;
+	}
+	public ImageIcon resizeImage(ImageIcon imgIcon) {
+		ImageIcon imageicon = imgIcon;
+		int width = imageicon.getIconWidth();
+		int height = imageicon.getIconHeight();
+		double ratio;
+		Image img = imageicon.getImage();
+		if (width > 61 || height > 61) {
+			if (width > height) { // 가로 사진
+				ratio = (double) height / width;
+				width = 61;
+				height = (int) (width * ratio);
+			} else { // 세로 사진
+				ratio = (double) width / height;
+				height = 61;
+				width = (int) (height * ratio);
+			}
+			Image new_img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			imageicon = new ImageIcon(new_img);
+		}
+		return imageicon;
 	}
 	
 	public MainView(String username, String ip_addr, String port_no) {
@@ -148,9 +169,6 @@ public class MainView extends JFrame {
 									addComponent(friendTextPane, label);
 									label.checkbox.setSelected(true);
 									label.checkbox.setEnabled(false);
-									
-									profileImg = label.getProfile();
-									userStatus = label.getStatus();
 								}
 							
 							for (FriendLabel label : FriendLabelList)
@@ -160,9 +178,13 @@ public class MainView extends JFrame {
 						}
 						else {  // 끝 신호가 오기 전까지 계속 add
 							String profile[] = data.split("\\|");
-							// TODO 프로필 둥글게
-							//ImageIcon round_img = new MakeRoundedCorner(cm.img, 30).run();
-							FriendLabelList.add(new FriendLabel(mainView, cm.img, profile[0], profile[1]));
+
+							if (profile[0].equals(userName)) {
+								profileImg = cm.img;
+								userStatus = cm.getData();
+							}
+							//ImageIcon round_img = new MakeRoundedCorner(resizeImage(cm.img), 30).run();
+							FriendLabelList.add(new FriendLabel(mainView, resizeImage(cm.img), profile[0], profile[1]));
 						}
 						break;
 
@@ -172,8 +194,8 @@ public class MainView extends JFrame {
 						for (FriendLabel friendlabel : FriendLabelList) {
 							// TODO FrinedLabel에 있는 ImgLable 변경
 							if (friendlabel.getUserName().equals(cm.getId())) {
-								// TODO
-								friendlabel.updateProfile(cm.img, cm.getId(), cm.getData());
+								//ImageIcon round_img = new MakeRoundedCorner(resizeImage(cm.img), 30).run();
+								friendlabel.updateProfile(resizeImage(cm.img), cm.getId(), cm.getData());
 							}
 						}
 						if (cm.getId().equals(userName)) {

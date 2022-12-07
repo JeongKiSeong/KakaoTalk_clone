@@ -4,7 +4,7 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.border.AbstractBorder;
 
-import utils.RoundedBorder;
+import utils.RoundedBorderChat;
 
 
 public class MsgLabel  extends JLabel {
@@ -22,11 +22,11 @@ public class MsgLabel  extends JLabel {
 		
 
         if (align.equals("L")) {
-        	brdr = new RoundedBorder(Color.BLACK,1,6,8);
+        	brdr = new RoundedBorderChat(Color.BLACK,1,6,8);
     		this.setBackground(Color.WHITE);
         }
         else {
-        	brdr = new RoundedBorder(Color.BLACK,1,6,8,false);
+        	brdr = new RoundedBorderChat(Color.BLACK,1,6,8,false);
     		this.setBackground(new Color(255, 235, 51));
         }
         setBorder(brdr);
