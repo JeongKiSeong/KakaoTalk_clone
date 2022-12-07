@@ -1,13 +1,16 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+import utils.ChatImgPanel;
 import utils.RoundedBorder;
 
 public class RoomLabel extends JLabel {
@@ -18,6 +21,7 @@ public class RoomLabel extends JLabel {
 	private ChatView chatView;
 	private JLabel smallTextLabel;
 	private JLabel bigTextLabel;
+	private JPanel imgPanel;
 
 	public RoomLabel(MainView mainView, ChatView cv, ImageIcon img, String roomName, String id) {
 		this.roomImg = img;
@@ -33,10 +37,8 @@ public class RoomLabel extends JLabel {
 		setMaximumSize(new Dimension(280, 70));
 		setMinimumSize(new Dimension(280, 70));
 		
-		JLabel imgLabel = new JLabel(roomImg);
-		imgLabel.setBorder(new RoundedBorder(Color.black, 1, 20));
-		this.add(imgLabel);
-		imgLabel.setBounds(5, 5, 61, 61);
+		imgPanel = new ChatImgPanel(img);
+	    this.add(imgPanel);
 		
 		bigTextLabel = new JLabel(roomName);
 		this.add(bigTextLabel);
@@ -87,5 +89,12 @@ public class RoomLabel extends JLabel {
 	
 	public void setRoomName(String roomName) {
 		bigTextLabel.setText(roomName);
+	}
+	public void setRoomImg(ImageIcon img) {
+		this.remove(imgPanel);
+		imgPanel = new ChatImgPanel(img);
+	    this.add(imgPanel);
+	    imgPanel.revalidate();
+	    imgPanel.repaint();
 	}
 }
