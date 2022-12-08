@@ -219,6 +219,14 @@ public class MainView extends JFrame {
 								roomLabel.setRoomName(cm.getData());
 							}
 						}
+						// RoomLabelList에서 ChatView 검색
+						for (RoomLabel room : RoomLabelList) {
+							if (room.getRoomId().equals(cm.room_id)) {
+								ChatView chatView = room.getChatView();
+								chatView.setRoomName(cm.getData());
+								break;
+							}
+						}
 						break;
 						
 					case "41": // 방 사진 변경
@@ -235,6 +243,8 @@ public class MainView extends JFrame {
 						DialogFriendLabelList.removeAll(DialogFriendLabelList);
 						ChatView chatView = null;
 						FriendDialog fd = null;
+						
+						// RoomLabelList에서 ChatView 검색
 						for (RoomLabel room : RoomLabelList) {
 							if (room.getRoomId().equals(cm.room_id)) {
 								chatView = room.getChatView();

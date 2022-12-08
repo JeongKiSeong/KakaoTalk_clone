@@ -48,6 +48,7 @@ public class ChatView extends JFrame {
 	private ChatView chatView;
 	private FriendDialog friendDialog;
 	private String room_name;
+	private JLabel roomNameLabel;
 	private List<MsgStatusPanel> msgStatusPanelList = new ArrayList<MsgStatusPanel>();
 	
 	
@@ -142,8 +143,8 @@ public class ChatView extends JFrame {
 		chatInfoPanel.setBounds(0, 0, 374, 43);
 		chatInfoPanel.setLayout(null);
 		
-		// 방 이름 버튼
-		JLabel roomNameLabel = new JLabel(room_name);
+		// 방 이름
+		roomNameLabel = new JLabel(room_name);
 		chatInfoPanel.add(roomNameLabel);
 		roomNameLabel.setBounds(12, 10, 227, 23);
 		roomNameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
@@ -374,6 +375,12 @@ public class ChatView extends JFrame {
 	
 	public String getRoomName() {
 		return room_name;
+	}
+	
+	public void setRoomName(String room_name) {
+		this.room_name = room_name;
+		roomNameLabel.setText(room_name);
+		this.setTitle(room_name);
 	}
 	
 	public MainView getMainVeiw() {
